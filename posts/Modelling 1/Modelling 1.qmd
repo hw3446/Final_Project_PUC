@@ -1,0 +1,265 @@
+---
+title: "Part 2"
+author: "Hannah Wilkie"
+date: "2025-04-22"
+categories: [news, code, analysis]
+image: "image.jpg"
+execute:
+  warning: false
+---
+```{r}
+library(tidyverse)
+library(broom)
+library(performance)
+library(ordinal)
+library(car)
+library(ggeffects)
+library(gofcat)
+library(brms)
+library(emmeans)
+library(knitr)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(gridExtra)
+library(grid)
+library(MASS) 
+library(reshape2) 
+library(reshape) 
+library(logistf)
+library(corrplot)
+```
+
+
+##Modelling 1
+
+The next phase in the analysis is to begin constructing some ordinal regression models describing the relationship between demographic data and thought types.
+
+I'm starting by filtering through the demographic variables for each thought type, and seeing which ones, if any, have effects on thought types in an ordinal regression model.
+
+```{r}
+input <- "https://raw.githubusercontent.com/hw3446/Final_Project_PUC/main/data/data.csv"
+
+data <- read_csv(input)
+```
+
+
+```{r}
+# List to store results
+models <- list()
+stepwise_models <- list()
+
+# List of outcome variables
+outcome_vars <- c("Fictional_story", "Abstract_shapes", "Sensory_sensations", 
+                  "Life_experiences", "Media", "Music", "Future_plans", 
+                  "Building", "Everyday")
+
+# Converting outcome variables to factors with consistent levels for each thought type
+data[outcome_vars] <- lapply(data[outcome_vars], factor, 
+                             levels = c("Not at all", "A small amount of the time", 
+                                        "A moderate amount of the time", "Most of the time", 
+                                        "All of the time"))
+
+
+#Making sure demographic variables are classed in the right way.
+data$Age <- as.numeric(data$Age)
+data$Practice <- as.numeric(as.character(data$Practice))
+data$Gender <- factor(data$Gender,  levels = c('Male', 'Female', 'Other'))
+data$Music_listening <- factor(data$Music_listening, levels = c('Very rarely', 'Somewhat rarely', 'Moderately frequently', 'Frequently', 'Very frequently'))
+data$Floor <- factor(data$Floor, levels = c('Downstairs', 'Upstairs'))
+
+
+# Loop through selected outcomes
+for (outcome in outcome_vars) {
+  formula <- as.formula(paste(outcome, "~ Age + Gender + Music_listening + Practice + Floor"))
+  
+  # Drop rows with NA values in the outcome or predictors
+  vars_to_check <- c(outcome, "Age", "Gender", "Music_listening", "Practice", "Floor")
+  data_subset <- data[complete.cases(data[vars_to_check]), ]
+
+  # Debugging message
+  cat("\nProcessing:", outcome, 
+      " | Rows before:", nrow(data), 
+      " | Rows after NA removal:", nrow(data_subset), "\n")
+
+  tryCatch({
+    # Fit proportional odds model
+    model <- polr(formula, data = data_subset, Hess = TRUE, method = "probit", 
+                  control = list(maxit = 1000), na.action = na.exclude)
+    
+    # Store model
+    models[[outcome]] <- model
+    
+    # Print summary
+    cat("\nSummary for", outcome, ":\n")
+    print(summary(model))
+    
+    # Perform stepwise regression
+    step_model <- step(model, direction = "backward", trace = FALSE)
+    stepwise_models[[outcome]] <- step_model
+    
+    # Print stepwise summary
+    cat("\nStepwise Model Summary for", outcome, ":\n")
+    print(summary(step_model))
+    
+  }, error = function(e) {
+    cat("\nSkipping", outcome, "due to error:", conditionMessage(e), "\n")
+  })
+}
+
+```
+
+
+Emmeans plots can be used to visualise the ordinal regression models, as shown below here for the relationship between Age and each thought type.
+```{r}
+# Only some of the outcome variables can be successfully plotted
+library(gridExtra)
+
+plot_list <- list()
+for (outcome in outcome_vars) {
+model <- polr(as.formula(paste(outcome, "~ Age")), data = data, Hess = TRUE)
+
+predicted_probs <- ggemmeans(model, terms = c("Age"))
+  
+plot <- ggplot(predicted_probs, aes(x = x, y = predicted, fill = response.level)) +
+    geom_area() + 
+    labs(x = "\nAge", 
+         y = "Predicted Probability\n", 
+         title = paste(outcome, "by Age")) +
+    scale_fill_manual(name = NULL,
+                      values = setNames(c("#deebf7", "#9ecae1", "#3182bd", "#08519c", "#08306b"),
+                                        levels(data[[outcome]])),
+                      labels = c("Not at all", "A small amount of the time", "A moderate amount of the time", "Most of the time", "All of the time"),
+                      breaks = c("Not at all", "A small amount of the time", "A moderate amount of the time", "Most of the time", "All of the time")
+                      ) + theme_minimal()
+  
+
+  plot_list[[outcome]] <- plot
+}
+
+title_grob <- textGrob("Types of Thoughts by Age, First Half", gp = gpar(fontsize = 16, fontface = "bold"))
+
+Age_thoughts_models <- grid.arrange(
+  grobs = plot_list, 
+  ncol = 3, 
+  top = title_grob  
+)
+
+```
+
+
+After narrowing down models using the step() method above, the main predictors are Music_listening and Practice for abstract shapes, Age for life experiences, Practice for music, and Age and practice for future plans. These can be plotted below.
+
+```{r}
+mod1 <- polr(formula = Abstract_shapes ~ Practice + Music_listening, data = data, Hess = TRUE, method = "probit")
+mod2 <- polr(formula = Life_experiences ~ Age, data = data, Hess = TRUE, method = "probit")
+mod3 <- polr(formula = Music ~ Practice, data = data, Hess = TRUE, method = "probit")
+mod4 <- polr(formula = Future_plans ~ Age + Practice, data = data, Hess = TRUE, method = "probit")
+
+pred1 <- ggemmeans(mod1, terms = c("Practice", "Music_listening"))
+pred2 <- ggemmeans(mod2, terms = c("Age"))
+pred3 <- ggemmeans(mod3, terms = c("Practice"))
+pred4 <- ggemmeans(mod4, terms = c("Age", "Practice"))
+
+custom_colors <- c("Not at all" = "#deebf7", 
+                   "A small amount of the time" = "#9ecae1", 
+                   "A moderate amount of the time" = "#3182bd", 
+                   "Most of the time" = "#08519c", 
+                   "All of the time" = "#08306b")
+
+
+# Plot for Abstract Shapes by Music Listening & Practice
+p1 <- ggplot(pred1, aes(x = x, y = predicted, fill = response.level)) +
+     geom_area(alpha = 1) + 
+     facet_wrap(~ group, scales = "free_y") +  
+     labs(x = "Practice", y = "Predicted Probability\n", title = "Abstract Shapes by Practice, Faceted by Classical Music Listening") +
+     scale_fill_manual(name = NULL, values = custom_colors) +
+     theme_minimal() +
+     theme(legend.position = "bottom")
+
+
+# Plot Life Experiences by Age
+p2 <- ggplot(pred2, aes(x = x, y = predicted, fill = response.level)) +
+  geom_area() + 
+  labs(x = "\nAge", y = "Predicted Probability\n", title = "Life Experiences by Age") +
+  scale_fill_manual(name = NULL, values = custom_colors) +
+  theme_minimal()
+
+
+# Plot for Music by Practice
+p3 <- ggplot(pred3, aes(x = x, y = predicted, fill = response.level)) +
+  geom_area() + 
+  labs(x = "\nPractice", y = "Predicted Probability\n", title = "Music by Practice") +
+  scale_fill_manual(name = NULL, values = custom_colors) +
+  theme_minimal()
+
+
+#Plot for Future Plans by Age & Practice -- converting practice into a grouped variable for readability
+practice_grouped_data <- practice_grouped_data <- data %>%
+  mutate(Practice_grouped = cut(Practice, 
+                                breaks = seq(min(Practice, na.rm = TRUE), 
+                                            max(Practice, na.rm = TRUE), 
+                                            by = 10)))
+
+mod5 <- polr(formula = Future_plans ~ Age + Practice_grouped, data = practice_grouped_data, Hess = TRUE, method = "probit")
+
+pred5 <- ggemmeans(mod5, terms = c("Age", "Practice_grouped"))
+
+p4 <- ggplot(pred5, aes(x = x, y = predicted, fill = response.level)) +
+     geom_area(alpha = 1) +
+     facet_wrap(~ group, scales = "free_y") +  # Facet by Practice
+     labs(x = "\nAge", y = "Predicted Probability\n", title = "Future Plans by Age, Faceted by Practice") +
+     scale_fill_manual(name = NULL, values = custom_colors) +
+     theme_minimal() +
+     theme(legend.position = "bottom")
+
+
+
+```
+
+We can also examine the nature of the interactions between demographics variables. The vif() outputs below indicate that multicollinearity shouldn't be a problem.
+
+```{r}
+demographics <- c('Age', 'Gender', 'Music_listening', 'Practice', 'Floor')
+demographics_data <- dplyr::select(data, all_of(demographics))
+
+# Convert categorical variables to numeric
+demographics_numeric <- demographics_data %>%
+  mutate(
+    Gender = as.numeric(factor(Gender)),
+    Music_listening = as.numeric(factor(Music_listening, ordered = TRUE)),  
+    Floor = as.numeric(factor(Floor))
+  ) 
+
+# Compute correlation matrix
+cor_matrix <- cor(demographics_numeric, use = "pairwise.complete.obs")
+
+# Plot heatmap
+corrplot(cor_matrix, method = "color", type = "lower", 
+         tl.col = "black", tl.srt = 45, addCoef.col = "white", 
+         col = colorRampPalette(c("blue", "white", "red"))(200))
+
+#Here's another way of visualising the interactions
+ggplot(data, aes(x = Age, y = Practice, color = Floor)) +
+  geom_point(alpha = 0.6) +  
+  geom_smooth(method = "lm", se = FALSE, linetype = "dashed") +
+  facet_wrap(~ Floor) +
+  labs(title = "Age vs. Practice by Floor",
+       x = "Age", 
+       y = "Practice (Number of Years)") +
+  theme_minimal()
+
+#Checking for collinearity
+model1 <- lm(Age ~ Practice + Gender + Music_listening + Floor, data = demographics_numeric)
+model2 <- lm(Gender ~ Age + Practice + Music_listening + Floor, data = demographics_numeric)
+model3 <- lm(Practice ~ Age + Gender + Music_listening + Floor, data = demographics_numeric)
+model4 <- lm(Music_listening ~ Age + Gender + Practice + Floor, data = demographics_numeric)
+model5 <- lm(Floor ~ Age + Gender + Practice + Music_listening, data = demographics_numeric)
+vif(model1)
+vif(model2)
+vif(model3)
+vif(model4)
+vif(model5)
+
+
+```
