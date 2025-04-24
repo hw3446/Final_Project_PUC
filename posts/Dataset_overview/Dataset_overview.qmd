@@ -207,7 +207,6 @@ datatable(data2)
 (These are the two dataframes that we'll be loading and working with in other sections of this blog.)
 
 ```{r}
-dir.create("working_data", recursive = TRUE, showWarnings = FALSE)
 write.csv(data, "working_data/data.csv", row.names = FALSE)
 write.csv(data2, "working_data/data2.csv", row.names = FALSE)
 ```

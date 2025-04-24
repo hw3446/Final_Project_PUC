@@ -8,32 +8,17 @@ execute:
   warning: false
 ---
 
-#Part 1 ##Descriptive 1
+In this section we'll look at the overall distribution of different thought types and movements in the datasets.
 
 ```{r}
 library(tidyverse)
 library(broom)
-library(performance)
-library(ordinal)
-library(car)
-library(ggeffects)
-library(gofcat)
-library(brms)
-library(emmeans)
-library(knitr)
 library(dplyr)
 library(ggplot2)
 library(tidyr)
-library(gridExtra)
-library(grid)
-library(MASS) 
-library(reshape2) 
-library(reshape) 
-library(logistf)
-library(corrplot)
 ```
 
-First we load the data for the first half of the concert, removing columns we don't want. I've also recoded the hall locations into two factors, 'Downstairs' and 'Upstairs'.
+We'll start in the first half of the concert. Here's the dataframe that we tidied up in the dataset overview page.
 
 ```{r}
 #Loading dataset, sheet 1
