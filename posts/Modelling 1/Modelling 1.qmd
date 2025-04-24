@@ -7,6 +7,7 @@ image: "image.jpg"
 execute:
   warning: false
 ---
+
 ```{r}
 library(tidyverse)
 library(broom)
@@ -30,7 +31,6 @@ library(logistf)
 library(corrplot)
 ```
 
-
 ##Modelling 1
 
 The next phase in the analysis is to begin constructing some ordinal regression models describing the relationship between demographic data and thought types.
@@ -42,7 +42,6 @@ input <- "https://raw.githubusercontent.com/hw3446/Final_Project_PUC/main/data/d
 
 data <- read_csv(input)
 ```
-
 
 ```{r}
 # List to store results
@@ -109,8 +108,8 @@ for (outcome in outcome_vars) {
 
 ```
 
-
 Emmeans plots can be used to visualise the ordinal regression models, as shown below here for the relationship between Age and each thought type.
+
 ```{r}
 # Only some of the outcome variables can be successfully plotted
 library(gridExtra)
@@ -146,7 +145,6 @@ Age_thoughts_models <- grid.arrange(
 )
 
 ```
-
 
 After narrowing down models using the step() method above, the main predictors are Music_listening and Practice for abstract shapes, Age for life experiences, Practice for music, and Age and practice for future plans. These can be plotted below.
 

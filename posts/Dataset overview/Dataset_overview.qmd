@@ -1,0 +1,206 @@
+---
+title: "Dataset_overview"
+format: html
+image: "Richardson.jpg"
+execute:
+  warning: false
+---
+
+This dataset examines the musical imaginings that people experience in a live concert setting. The data was collected in a survey format.
+
+For some background, the survey in question was distributed at a classical concert in the Princeton University Concerts series (Feb 20th, 2025). During the concert’s intermission, and at the end of the concert, audience members answered a series of questions designed to scrutinise the nature of their imaginative responses to the music performed. Distribution was via both paper surveys, and online using Qualtrics. In each part of the survey, the audience were asked about the frequency with which they experienced different types of thought, memory and imagining. They then identified the musical movements during which they imagined the most vivid fictional scenes and memories, and provided free-text responses describing these.
+
+You can find a PDF of the paper survey here for reference:
+
+<https://raw.githubusercontent.com/hw3446/Final_Project_PUC/59ab7bc00c7b9a0fc35517cc5b3335cf23fdc4ab/Paper_survey.pdf>
+
+```{r}
+library(tidyverse)
+library(broom)
+library(dplyr)
+library(ggplot2)
+```
+
+The data is in two halves for intermission and post-concert data. It is also divided into paper and online data. We'll start by loading all the intermission data.
+
+```{r}
+library(conflicted)
+conflict_prefer("filter", "dplyr")
+
+data_paper <- read_csv("https://raw.githubusercontent.com/hw3446/Final_Project_PUC/main/input/PUC1.csv")
+
+data_qualtrics <- read_csv("https://raw.githubusercontent.com/hw3446/Final_Project_PUC/main/input_qualtrics/PUC1.csv")
+
+```
+
+In order to combine the two intermission datasets, we need to reshape them a little bit.
+
+```{r}
+##Here I'm just recoding some of the numeric values in the paper dataset to align with their likert scale values, for readability.
+
+recode <- c("1" = "Not at all",
+                "2" = "A small amount of the time",
+                "3" = "A moderate amount of the time",
+                "4" = "Most of the time",
+                "5" = "All of the time")
+
+recode2 <- c("1" = "Not at all",
+             "2" = "Slightly",
+             "3" = "Moderately",
+             "4" = "Mostly",
+             "5" = "Entirely")
+
+recode3 <- c("1" = "Very rarely",
+             "2" = "Somewhat rarely",
+             "3" = "Moderately frequently",
+             "4" = "Frequently",
+             "5" = "Very frequently")
+
+data_paper[, 2:10] <- lapply(data_paper[, 2:10], function(x) recode[as.character(x)])
+data_paper[, 13:15] <- lapply(data_paper[, 13:15], function(x) recode2[as.character(x)])
+data_paper[, 18:20] <- lapply(data_paper[, 18:20], function(x) recode2[as.character(x)])
+data_paper[, 24] <- lapply(data_paper[, 24], function(x) recode3[as.character(x)])
+```
+
+In the qualtrics data there are some extra columns that we don't need, so we're getting rid of those.
+
+```{r}
+data_qualtrics <- data_qualtrics %>% dplyr::filter(Finished == "TRUE") %>% 
+  dplyr::select(-StartDate, -EndDate, -Status, -Progress, -Duration, 
+         -RecordedDate, -DistributionChannel, -UserLanguage, -Finished, -Q1, -ResponseId)
+```
+
+The way people select composer and movement is different for the paper and online surveys, so we need to get them in a matching format.
+
+```{r}
+composer_initials <- data.frame(
+  composer = c("Beethoven", "Hough"),
+  composer_initial = c("B", "H")
+)
+
+data_long <- data_qualtrics %>%
+  pivot_longer(
+    cols = starts_with("Movement"),
+    names_to = "source_col",
+    values_to = "movement_label"
+  ) %>%
+  filter(!is.na(movement_label)) %>%
+  mutate(
+    composer = case_when(
+      str_detect(source_col, "_B_") ~ "Beethoven",
+      str_detect(source_col, "_H_") ~ "Hough"
+    ),
+    type = case_when(
+      str_detect(source_col, "_mem$") ~ "mem",
+      str_detect(source_col, "_story$") ~ "story"
+    ),
+    movement = as.integer(str_extract(movement_label, "\\d+"))
+  ) %>%
+  left_join(composer_initials, by = "composer") %>%
+  mutate(code = paste0(composer_initial, movement))
+
+data_wide <- data_long %>%
+  dplyr::select(ID, type, code) %>%
+  pivot_wider(
+    names_from = type,
+    values_from = code,
+    names_prefix = "Movement_"
+  )
+
+final_qualtrics <- data_qualtrics %>%
+  left_join(data_wide, by = "ID")
+```
+
+Now we can combine the dataframes:
+
+```{r}
+data <- bind_rows(data_paper, final_qualtrics)
+data <- data%>% dplyr::select(-Movement_H_story, -Movement_B_story, -Piece_story, -Movement_H_mem, -Movement_B_mem, -Piece_mem)
+```
+
+Note: to keep track of participants between each half of the survey, they were given a random ID in qualtrics, or were manually numbered in the paper data. We're keeping hold of these columns for now so we can match the demographic variables to the right participant when we load the post-concert data. But essentially, participants who were online won't have a participant number, and paper participants won't have an ID.
+
+To view the combined dataset:
+
+```{r}
+knitr::kable(data, format = "html", digits = 2)
+
+```
+
+SECOND HALF
+
+These next steps essentially repeat the above, but for the post-concert data.
+
+Loading the data:
+
+```{r}
+data_paper2 <- read_csv("https://raw.githubusercontent.com/hw3446/Final_Project_PUC/main/input/PUC2.csv")
+
+data_qualtrics2 <- read_csv("https://raw.githubusercontent.com/hw3446/Final_Project_PUC/main/input_qualtrics/PUC2.csv")
+
+```
+
+Recoding / removing unnecessary columns:
+
+```{r}
+recode <- c("1" = "Not at all",
+                "2" = "A small amount of the time",
+                "3" = "A moderate amount of the time",
+                "4" = "Most of the time",
+                "5" = "All of the time")
+
+recode2 <- c("1" = "Not at all",
+             "2" = "Slightly",
+             "3" = "Moderately",
+             "4" = "Mostly",
+             "5" = "Entirely")
+
+data_paper2[, 2:10] <- lapply(data_paper2[, 2:10], function(x) recode[as.character(x)])
+data_paper2[, 13:15] <- lapply(data_paper2[, 13:15], function(x) recode2[as.character(x)])
+data_paper2[, 18:20] <- lapply(data_paper2[, 18:20], function(x) recode2[as.character(x)])
+
+data_qualtrics2 <- data_qualtrics2 %>% dplyr::filter(Finished == "TRUE") %>% 
+  dplyr::select(-StartDate, -EndDate, -Status, -Progress, -Duration, 
+         -RecordedDate, -DistributionChannel, -UserLanguage, -Finished, -ResponseId)
+```
+
+Reworking Qualtrics data so the formats match:
+
+```{r}
+final_qualtrics2 <- data_qualtrics2 %>%
+    filter(!is.na(Movement_mem)) %>% filter(!is.na(Movement_story)) %>%
+  mutate(Movement_mem = paste0("Br", str_extract(Movement_mem, "\\d+"))) %>%
+    mutate(Movement_story = paste0("Br", str_extract(Movement_story, "\\d+")))
+```
+
+Combining Qualtrics and paper data:
+
+```{r}
+data2 <- bind_rows(data_paper2, final_qualtrics2)
+```
+
+IMPORTANT: We need to pull the demographic information from the first half of the concert and match it to the second half, making sure it's matched to the right participant. We can do this using the numbers and unique IDs assigned to participants.
+
+```{r}
+demographics <- data[, c("Age", "Gender", "Music_listening", "Practice", "Location", "Participant_number", "ID")] 
+
+data2 <- data2 %>%
+  mutate(join_key = ifelse(!is.na(Participant_number), Participant_number, ID))
+
+demographics <- demographics %>%
+  mutate(join_key = ifelse(!is.na(Participant_number), Participant_number, ID))
+
+data2 <- data2 %>%
+  left_join(demographics, by = "join_key")
+
+data2 <- data2 %>% dplyr::select(-Participant_number.y, -ID.y, -Participant_number.x, -ID.x)
+```
+
+To view the dataset for the second half, including the matched demographic data:
+
+```{r}
+knitr::kable(data2, format = "html", digits = 2)
+
+```
+
+These are the two dataframes that we'll be loading and working with in other sections of this blog.
