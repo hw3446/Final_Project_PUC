@@ -123,7 +123,8 @@ Note: to keep track of participants between each half of the survey, they were g
 To view the combined dataset:
 
 ```{r}
-knitr::kable(data, format = "html", digits = 2)
+library(DT)
+datatable(data)
 
 ```
 
@@ -199,8 +200,14 @@ data2 <- data2 %>% dplyr::select(-Participant_number.y, -ID.y, -Participant_numb
 To view the dataset for the second half, including the matched demographic data:
 
 ```{r}
-knitr::kable(data2, format = "html", digits = 2)
+datatable(data2)
 
 ```
 
-These are the two dataframes that we'll be loading and working with in other sections of this blog.
+(These are the two dataframes that we'll be loading and working with in other sections of this blog.)
+
+```{r}
+dir.create("working_data", recursive = TRUE, showWarnings = FALSE)
+write.csv(data, "working_data/data.csv", row.names = FALSE)
+write.csv(data2, "working_data/data2.csv", row.names = FALSE)
+```
