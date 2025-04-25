@@ -1,5 +1,5 @@
 ---
-title: "Did this update??"
+title: "Ordinal regression: an overview"
 author: "Hannah Wilkie"
 date: "2025-04-22"
 categories: [news, code, analysis]
@@ -15,249 +15,184 @@ library(performance)
 library(ordinal)
 library(car)
 library(ggeffects)
-library(gofcat)
+library(gofcat) 
 library(brms)
 library(emmeans)
 library(knitr)
-library(dplyr)
-library(ggplot2)
-library(tidyr)
-library(gridExtra)
-library(grid)
-library(MASS) 
-library(reshape2) 
-library(reshape) 
-library(logistf)
-library(corrplot)
+library(MASS)
 ```
 
-##Modelling 1
+In this section, we'll discuss how to model some of our data using ordinal regression. This will examine the relationship between demographic data and thought types.
 
-The next phase in the analysis is to begin constructing some ordinal regression models describing the relationship between demographic data and thought types.
-
-I'm starting by filtering through the demographic variables for each thought type, and seeing which ones, if any, have effects on thought types in an ordinal regression model.
+Let's reload our data from each half of the concert:
 
 ```{r}
-input <- "https://raw.githubusercontent.com/hw3446/Final_Project_PUC/main/data/data.csv"
+data1 <- read_csv("https://raw.githubusercontent.com/hw3446/Final_Project_PUC/main/posts/Dataset_overview/working_data/data.csv")
 
-data <- read_csv(input)
+data2 <- read_csv("https://raw.githubusercontent.com/hw3446/Final_Project_PUC/main/posts/Dataset_overview/working_data/data2.csv")
 ```
 
-```{r}
-# List to store results
-models <- list()
-stepwise_models <- list()
+Before constructing models, we'll make sure all of our demographic and outcome variables are classed in the right way.
 
-# List of outcome variables
+```{r}
 outcome_vars <- c("Fictional_story", "Abstract_shapes", "Sensory_sensations", 
                   "Life_experiences", "Media", "Music", "Future_plans", 
                   "Building", "Everyday")
 
 # Converting outcome variables to factors with consistent levels for each thought type
-data[outcome_vars] <- lapply(data[outcome_vars], factor, 
+data1[outcome_vars] <- lapply(data1[outcome_vars], factor, 
                              levels = c("Not at all", "A small amount of the time", 
                                         "A moderate amount of the time", "Most of the time", 
                                         "All of the time"))
 
+data2[outcome_vars] <- lapply(data2[outcome_vars], factor, 
+                             levels = c("Not at all", "A small amount of the time", 
+                                        "A moderate amount of the time", "Most of the time", 
+                                        "All of the time"))
+
+#Just remaking the floor variable
+data1 <- data1 %>%
+  mutate(Floor = ifelse(Location %in% c("A", "B", "C", "D", "E", "F"), "Downstairs", "Upstairs")) %>% relocate(Floor, .after = Location)
+
+data2 <- data2 %>%
+  mutate(Floor = ifelse(Location %in% c("A", "B", "C", "D", "E", "F"), "Downstairs", "Upstairs")) %>% relocate(Floor, .after = Location)
 
 #Making sure demographic variables are classed in the right way.
-data$Age <- as.numeric(data$Age)
-data$Practice <- as.numeric(as.character(data$Practice))
-data$Gender <- factor(data$Gender,  levels = c('Male', 'Female', 'Other'))
-data$Music_listening <- factor(data$Music_listening, levels = c('Very rarely', 'Somewhat rarely', 'Moderately frequently', 'Frequently', 'Very frequently'))
-data$Floor <- factor(data$Floor, levels = c('Downstairs', 'Upstairs'))
+data1$Age <- as.numeric(data1$Age)
+data2$Age <- as.numeric(data2$Age)
+data1$Practice <- as.numeric(as.character(data1$Practice))
+data2$Practice <- as.numeric(as.character(data2$Practice))
+data1$Gender <- factor(data1$Gender,  levels = c('Male', 'Female', 'Other'))
+data2$Gender <- factor(data2$Gender,  levels = c('Male', 'Female', 'Other'))
+data1$Music_listening <- factor(data1$Music_listening, levels = c('Very rarely', 'Somewhat rarely', 'Moderately frequently', 'Frequently', 'Very frequently'))
+data2$Music_listening <- factor(data2$Music_listening, levels = c('Very rarely', 'Somewhat rarely', 'Moderately frequently', 'Frequently', 'Very frequently'))
+data1$Floor <- factor(data1$Floor, levels = c('Downstairs', 'Upstairs'))
+data2$Floor <- factor(data2$Floor, levels = c('Downstairs', 'Upstairs'))
+```
+
+Let's start with a simple model that considers the relationship between a demographic and the likelihood of imagining a fictional story based on a particular demographic variable. We'll just use the data from the first half of the concert.
+
+Here's a plot showing the percentage of participants in each ordinal level for fictional story, by gender and age. We're ignoring N/As for now:
+
+```{r}
+data1 <- data1 %>%
+  filter(!is.na(Age) & !is.na(Gender) & !is.na(Fictional_story)) %>% filter(Gender != 'Other')
+
+fiction_gender <- data1 %>%
+  group_by(Fictional_story, Gender) %>% summarise(Count = n(), .groups = 'drop') %>%
+  mutate('Percentage' = Count / sum(Count) * 100)
+
+ggplot(fiction_gender, aes(x = Fictional_story, y = Percentage, fill = Gender)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = "Level", y = "Percentage", fill = "Gender") +
+  ggtitle("Percentage in Each Level for Fictional Story by Gender") +
+  theme_minimal() +   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
-# Loop through selected outcomes
-for (outcome in outcome_vars) {
-  formula <- as.formula(paste(outcome, "~ Age + Gender + Music_listening + Practice + Floor"))
-  
-  # Drop rows with NA values in the outcome or predictors
-  vars_to_check <- c(outcome, "Age", "Gender", "Music_listening", "Practice", "Floor")
-  data_subset <- data[complete.cases(data[vars_to_check]), ]
+fiction_age <- data1 %>%
+  group_by(Fictional_story, Age) %>% summarise(Count = n(), .groups = 'drop') %>%
+  mutate('Percentage' = Count / sum(Count) * 100)
 
-  # Debugging message
-  cat("\nProcessing:", outcome, 
-      " | Rows before:", nrow(data), 
-      " | Rows after NA removal:", nrow(data_subset), "\n")
+fiction_age %>% 
+  ggplot(aes(x = Fictional_story, y = Age, fill = Fictional_story)) +
+  geom_boxplot() +
+  xlab("Level") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-  tryCatch({
-    # Fit proportional odds model
-    model <- polr(formula, data = data_subset, Hess = TRUE, method = "probit", 
-                  control = list(maxit = 1000), na.action = na.exclude)
-    
-    # Store model
-    models[[outcome]] <- model
-    
-    # Print summary
-    cat("\nSummary for", outcome, ":\n")
-    print(summary(model))
-    
-    # Perform stepwise regression
-    step_model <- step(model, direction = "backward", trace = FALSE)
-    stepwise_models[[outcome]] <- step_model
-    
-    # Print stepwise summary
-    cat("\nStepwise Model Summary for", outcome, ":\n")
-    print(summary(step_model))
-    
-  }, error = function(e) {
-    cat("\nSkipping", outcome, "due to error:", conditionMessage(e), "\n")
-  })
-}
 
 ```
 
-Emmeans plots can be used to visualise the ordinal regression models, as shown below here for the relationship between Age and each thought type.
+Here's an alternative visualisation with age as a gouped variable:
 
 ```{r}
-# Only some of the outcome variables can be successfully plotted
-library(gridExtra)
+max_age <- max(data1$Age, na.rm = TRUE)
+min_age <- min(data1$Age, na.rm = TRUE)
 
-plot_list <- list()
-for (outcome in outcome_vars) {
-model <- polr(as.formula(paste(outcome, "~ Age")), data = data, Hess = TRUE)
+breaks <- c(seq(min_age, max_age - 1, by = 20), max_age)
 
-predicted_probs <- ggemmeans(model, terms = c("Age"))
-  
-plot <- ggplot(predicted_probs, aes(x = x, y = predicted, fill = response.level)) +
-    geom_area() + 
-    labs(x = "\nAge", 
-         y = "Predicted Probability\n", 
-         title = paste(outcome, "by Age")) +
-    scale_fill_manual(name = NULL,
-                      values = setNames(c("#deebf7", "#9ecae1", "#3182bd", "#08519c", "#08306b"),
-                                        levels(data[[outcome]])),
-                      labels = c("Not at all", "A small amount of the time", "A moderate amount of the time", "Most of the time", "All of the time"),
-                      breaks = c("Not at all", "A small amount of the time", "A moderate amount of the time", "Most of the time", "All of the time")
-                      ) + theme_minimal()
-  
+data1 <- data1 %>%
+  mutate(Age_grouped = cut(Age, 
+                           breaks = breaks,
+                           include.lowest = TRUE,
+                           right = TRUE))
 
-  plot_list[[outcome]] <- plot
-}
 
-title_grob <- textGrob("Types of Thoughts by Age, First Half", gp = gpar(fontsize = 16, fontface = "bold"))
+data1$Age_grouped <- as.factor(data1$Age_grouped)
 
-Age_thoughts_models <- grid.arrange(
-  grobs = plot_list, 
-  ncol = 3, 
-  top = title_grob  
-)
+fiction_age_grouped <- data1 %>%
+  group_by(Fictional_story, Age_grouped) %>% summarise(Count = n(), .groups = 'drop') %>%
+  mutate('Percentage' = Count / sum(Count) * 100)
+
+ggplot(fiction_age_grouped, aes(x = Fictional_story, y = Percentage, fill = Age_grouped)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = "Fictional_story", y = "Percentage", fill = "Age Group") +
+  ggtitle("Percentage in Each Level for Fictional Story by Age Group") +
+  theme_minimal() +   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
 
 ```
 
-After narrowing down models using the step() method above, the main predictors are Music_listening and Practice for abstract shapes, Age for life experiences, Practice for music, and Age and practice for future plans. These can be plotted below.
+To create an ordinal regression model, we use the clm() function. Here's a simple example showing the relationship between age and likelihood of imagining a fictional story based on data from the first half of the concert.
 
 ```{r}
-mod1 <- polr(formula = Abstract_shapes ~ Practice + Music_listening, data = data, Hess = TRUE, method = "probit")
-mod2 <- polr(formula = Life_experiences ~ Age, data = data, Hess = TRUE, method = "probit")
-mod3 <- polr(formula = Music ~ Practice, data = data, Hess = TRUE, method = "probit")
-mod4 <- polr(formula = Future_plans ~ Age + Practice, data = data, Hess = TRUE, method = "probit")
+model_fiction_age <- clm(Fictional_story ~ Age, data = data1, Hess = TRUE)
 
-pred1 <- ggemmeans(mod1, terms = c("Practice", "Music_listening"))
-pred2 <- ggemmeans(mod2, terms = c("Age"))
-pred3 <- ggemmeans(mod3, terms = c("Practice"))
-pred4 <- ggemmeans(mod4, terms = c("Age", "Practice"))
+model_fiction_age %>% 
+  tidy() %>%
+  kable()
+```
 
-custom_colors <- c("Not at all" = "#deebf7", 
-                   "A small amount of the time" = "#9ecae1", 
-                   "A moderate amount of the time" = "#3182bd", 
-                   "Most of the time" = "#08519c", 
-                   "All of the time" = "#08306b")
+Based on the model outcome for the 'Age' term (estimate = -0.0119), we can see that as age increases, respondents are less likely to choose higher categories (e.g. less likely to report experiencing a fictional story frequently). However, p = 0.214, so this is not statistically significant.
 
+`ggemmeans` can be used to visualise the model.
 
-# Plot for Abstract Shapes by Music Listening & Practice
-p1 <- ggplot(pred1, aes(x = x, y = predicted, fill = response.level)) +
-     geom_area(alpha = 1) + 
-     facet_wrap(~ group, scales = "free_y") +  
-     labs(x = "Practice", y = "Predicted Probability\n", title = "Abstract Shapes by Practice, Faceted by Classical Music Listening") +
-     scale_fill_manual(name = NULL, values = custom_colors) +
-     theme_minimal() +
-     theme(legend.position = "bottom")
+```{r}
+predictions <- ggemmeans(model_fiction_age, terms = "Age")
 
-
-# Plot Life Experiences by Age
-p2 <- ggplot(pred2, aes(x = x, y = predicted, fill = response.level)) +
+ggplot(predictions, aes(x = x, y = predicted, fill = response.level)) +
   geom_area() + 
-  labs(x = "\nAge", y = "Predicted Probability\n", title = "Life Experiences by Age") +
-  scale_fill_manual(name = NULL, values = custom_colors) +
+  labs(x = "\nAge", 
+       y = "Predicted Probability\n", 
+       title = "Fictional_story by Age") +
+  scale_fill_manual(
+    name = NULL,
+    values = c("#deebf7", "#9ecae1", "#3182bd", "#08519c", "#08306b"),
+    labels = c("Not at all",
+               "A small amount of the time",
+               "A moderate amount of the time",
+               "Most of the time",
+               "All of the time")
+  ) +
   theme_minimal()
-
-
-# Plot for Music by Practice
-p3 <- ggplot(pred3, aes(x = x, y = predicted, fill = response.level)) +
-  geom_area() + 
-  labs(x = "\nPractice", y = "Predicted Probability\n", title = "Music by Practice") +
-  scale_fill_manual(name = NULL, values = custom_colors) +
-  theme_minimal()
-
-
-#Plot for Future Plans by Age & Practice -- converting practice into a grouped variable for readability
-practice_grouped_data <- practice_grouped_data <- data %>%
-  mutate(Practice_grouped = cut(Practice, 
-                                breaks = seq(min(Practice, na.rm = TRUE), 
-                                            max(Practice, na.rm = TRUE), 
-                                            by = 10)))
-
-mod5 <- polr(formula = Future_plans ~ Age + Practice_grouped, data = practice_grouped_data, Hess = TRUE, method = "probit")
-
-pred5 <- ggemmeans(mod5, terms = c("Age", "Practice_grouped"))
-
-p4 <- ggplot(pred5, aes(x = x, y = predicted, fill = response.level)) +
-     geom_area(alpha = 1) +
-     facet_wrap(~ group, scales = "free_y") +  # Facet by Practice
-     labs(x = "\nAge", y = "Predicted Probability\n", title = "Future Plans by Age, Faceted by Practice") +
-     scale_fill_manual(name = NULL, values = custom_colors) +
-     theme_minimal() +
-     theme(legend.position = "bottom")
-
-
-
 ```
 
-We can also examine the nature of the interactions between demographics variables. The vif() outputs below indicate that multicollinearity shouldn't be a problem.
+It's also good to run a brant test to tell us whether the proportional odds assumption holds in our current model. The assumption is that the relationship between predictor and output is the same across all levels of the ordinal outcomes.
 
 ```{r}
-demographics <- c('Age', 'Gender', 'Music_listening', 'Practice', 'Floor')
-demographics_data <- dplyr::select(data, all_of(demographics))
-
-# Convert categorical variables to numeric
-demographics_numeric <- demographics_data %>%
-  mutate(
-    Gender = as.numeric(factor(Gender)),
-    Music_listening = as.numeric(factor(Music_listening, ordered = TRUE)),  
-    Floor = as.numeric(factor(Floor))
-  ) 
-
-# Compute correlation matrix
-cor_matrix <- cor(demographics_numeric, use = "pairwise.complete.obs")
-
-# Plot heatmap
-corrplot(cor_matrix, method = "color", type = "lower", 
-         tl.col = "black", tl.srt = 45, addCoef.col = "white", 
-         col = colorRampPalette(c("blue", "white", "red"))(200))
-
-#Here's another way of visualising the interactions
-ggplot(data, aes(x = Age, y = Practice, color = Floor)) +
-  geom_point(alpha = 0.6) +  
-  geom_smooth(method = "lm", se = FALSE, linetype = "dashed") +
-  facet_wrap(~ Floor) +
-  labs(title = "Age vs. Practice by Floor",
-       x = "Age", 
-       y = "Practice (Number of Years)") +
-  theme_minimal()
-
-#Checking for collinearity
-model1 <- lm(Age ~ Practice + Gender + Music_listening + Floor, data = demographics_numeric)
-model2 <- lm(Gender ~ Age + Practice + Music_listening + Floor, data = demographics_numeric)
-model3 <- lm(Practice ~ Age + Gender + Music_listening + Floor, data = demographics_numeric)
-model4 <- lm(Music_listening ~ Age + Gender + Practice + Floor, data = demographics_numeric)
-model5 <- lm(Floor ~ Age + Gender + Practice + Music_listening, data = demographics_numeric)
-vif(model1)
-vif(model2)
-vif(model3)
-vif(model4)
-vif(model5)
-
-
+brant.test(model_fiction_age)
 ```
+
+From the above, we can see that the proportional odds assumption does hold in our model.
+
+MODEL COMPARISONS
+
+Let's do some comparing comparison now. Here we're going to integrate age and gender into the same model.
+
+```{r}
+Fiction_int = clm(Fictional_story ~ Gender*Age, data=data1)
+
+    tidy(Fiction_int) %>%
+      kable()
+```
+
+We can compare this against the model using just age.
+
+```{r}
+model_int <- clm(Fictional_story ~ Gender*Age, data = data1)
+model_no_int <- clm(Fictional_story ~ Age, data = data1)
+
+anova(model_int, model_no_int) %>% kable()
+```
+
+The p value is still significantly above 0.05, so adding gender as an interaction variable doesn't significantly improve the model.
+
+The question is, how can we select models with optimum demographic inputs? This is what will be covered in the 'Model Selection' portion of this blog.
