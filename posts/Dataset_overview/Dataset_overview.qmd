@@ -2,6 +2,7 @@
 title: "An overview of the dataset"
 format: html
 image: "Richardson.jpg"
+author: "Hannah Wilkie"
 execute:
   warning: false
 ---

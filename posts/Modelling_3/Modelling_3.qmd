@@ -2,4 +2,3 @@
 title: "Ordinal regression: final models"
 format: html
 ---
-

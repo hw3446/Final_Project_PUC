@@ -1,5 +1,268 @@
 ---
 title: "Ordinal regression: model Selection"
 format: html
+author: "Hannah Wilkie"
+execute:
+  warning: false
 ---
 
+```{r}
+library(tidyverse)
+library(MASS)
+library(dplyr)
+library(corrplot)
+library(car)
+```
+
+In this section, we'll experiment with the step() function in R to help select ordinal regression models for our data.
+
+step() is not compatible with clm(), which is why we'll use polr().
+
+The step() function starts with a full model containing all the possible main effects (in this case all the possible demographic variables). It tests different combinations of variables and then keeps the model with the lowest AIC.
+
+This is helpful when we're dealing with lots of different outcome variables and lots of demographic inputs and we need to figure out which ones to use.
+
+Here's how we'd run the step() function starting with all the demographic variables and using just fictional story as our outcome.
+
+First some data loading, and demographic variable tidying.
+
+```{r}
+data1 <- read_csv("https://raw.githubusercontent.com/hw3446/Final_Project_PUC/main/posts/Dataset_overview/working_data/data.csv")
+
+data2 <- read_csv("https://raw.githubusercontent.com/hw3446/Final_Project_PUC/main/posts/Dataset_overview/working_data/data2.csv")
+```
+
+```{r}
+outcome_vars <- c("Fictional_story", "Abstract_shapes", "Sensory_sensations", 
+                  "Life_experiences", "Media", "Music", "Future_plans", 
+                  "Building", "Everyday")
+
+# Converting outcome variables to factors with consistent levels for each thought type
+data1[outcome_vars] <- lapply(data1[outcome_vars], factor, 
+                             levels = c("Not at all", "A small amount of the time", 
+                                        "A moderate amount of the time", "Most of the time", 
+                                        "All of the time"))
+
+data2[outcome_vars] <- lapply(data2[outcome_vars], factor, 
+                             levels = c("Not at all", "A small amount of the time", 
+                                        "A moderate amount of the time", "Most of the time", 
+                                        "All of the time"))
+
+#Remaking the floor variable
+data1 <- data1 %>%
+  mutate(Floor = ifelse(Location %in% c("A", "B", "C", "D", "E", "F"), "Downstairs", "Upstairs")) %>% relocate(Floor, .after = Location)
+
+data2 <- data2 %>%
+  mutate(Floor = ifelse(Location %in% c("A", "B", "C", "D", "E", "F"), "Downstairs", "Upstairs")) %>% relocate(Floor, .after = Location)
+
+#Making sure demographic variables are classed in the right way.
+data1$Age <- as.numeric(data1$Age)
+data2$Age <- as.numeric(data2$Age)
+data1$Practice <- as.numeric(as.character(data1$Practice))
+data2$Practice <- as.numeric(as.character(data2$Practice))
+data1$Gender <- factor(data1$Gender,  levels = c('Male', 'Female', 'Other'))
+data2$Gender <- factor(data2$Gender,  levels = c('Male', 'Female', 'Other'))
+data1$Music_listening <- factor(data1$Music_listening, levels = c('Very rarely', 'Somewhat rarely', 'Moderately frequently', 'Frequently', 'Very frequently'))
+data2$Music_listening <- factor(data2$Music_listening, levels = c('Very rarely', 'Somewhat rarely', 'Moderately frequently', 'Frequently', 'Very frequently'))
+data1$Floor <- factor(data1$Floor, levels = c('Downstairs', 'Upstairs'))
+data2$Floor <- factor(data2$Floor, levels = c('Downstairs', 'Upstairs'))
+```
+
+1.  Start by specifying the model with the maximum number of demographic inputs.
+
+```{r}
+library(tidyr)
+vars_to_check <- c("Fictional_story", "Age", "Gender", "Music_listening", "Practice", "Floor")
+data_clean1 <- data1[complete.cases(data1[vars_to_check]), ]
+
+full_model_fiction <- polr(Fictional_story ~ Age  + Gender + Music_listening + Practice + Floor, data = data_clean1, Hess = TRUE)
+```
+
+```{r}
+
+stepwise_model <- step(full_model_fiction)
+
+summary(stepwise_model)
+
+```
+
+We'll repeat this looping through all the different thought types.
+
+```{r}
+# List to store results
+models <- list()
+stepwise_models <- list()
+
+# Loop through selected outcomes
+for (outcome in outcome_vars) {
+  formula <- as.formula(paste(outcome, "~ Age + Gender + Music_listening + Practice + Floor"))
+  
+  # Drop rows with NA values in the outcome or predictors
+  vars_to_check <- c(outcome, "Age", "Gender", "Music_listening", "Practice", "Floor")
+  data1_subset <- data1[complete.cases(data1[vars_to_check]), ]
+
+  # Debugging message
+  cat("\nProcessing:", outcome, 
+      " | Rows before:", nrow(data1), 
+      " | Rows after NA removal:", nrow(data1_subset), "\n")
+
+  tryCatch({
+    # Fit proportional odds model
+    model <- polr(formula, data = data1_subset, Hess = TRUE, method = "probit", 
+                  control = list(maxit = 1000), na.action = na.exclude)
+    
+    # Store model
+    models[[outcome]] <- model
+    
+    # Print summary
+    cat("\nSummary for", outcome, ":\n")
+    print(summary(model))
+    
+    # Perform stepwise regression
+    step_model <- step(model, direction = "backward", trace = FALSE)
+    stepwise_models[[outcome]] <- step_model
+    
+    # Print stepwise summary
+    cat("\nStepwise Model Summary for", outcome, ":\n")
+    print(summary(step_model))
+    
+  }, error = function(e) {
+    cat("\nSkipping", outcome, "due to error:", conditionMessage(e), "\n")
+  })
+}
+
+```
+
+We had to filter out a lot of missing data. Here's a version which handels the NAs better.
+
+```{r}
+library(Amelia)
+demographics_outcomes <- c('Age', 'Gender', 'Music_listening', 'Practice', 'Floor', "Fictional_story", "Abstract_shapes", "Sensory_sensations", 
+                  "Life_experiences", "Media", "Music", "Future_plans", 
+                  "Building", "Everyday")
+
+dem_out <- dplyr::select(data1, all_of(demographics_outcomes))
+missmap(dem_out)
+
+```
+
+```{r}
+library(naniar)
+mcar_test(dem_out)
+
+```
+
+p \> 0.05, so there is insufficient evidence to reject the null hypothesis that the data is MCAR.
+
+We can use imputation to deal with the NAs.
+
+```{r}
+library(mice)
+imputed_data1 <- mice(data1, m = 5, method = 'pmm', seed = 123, print = FALSE)
+completed_data1 <- complete(imputed_data1, 1)
+
+```
+
+Let's rerun the step() function with our imputed models.
+
+```{r}
+model_fiction_imp <- polr(Fictional_story ~ Age + Gender + Music_listening + Practice + Floor, 
+              data = completed_data1, Hess = TRUE, method = "probit")
+
+stepwise_model_imp <- step(model_fiction_imp)
+
+summary(stepwise_model_imp)
+```
+
+We'll repeat this for all our different models again.
+
+```{r}
+# List to store results
+models <- list()
+stepwise_models <- list()
+
+# Loop through selected outcomes
+for (outcome in outcome_vars) {
+  formula <- as.formula(paste(outcome, "~ Age + Gender + Music_listening + Practice + Floor"))
+
+  tryCatch({
+    # Fit proportional odds model
+    model <- polr(formula, data = completed_data1, Hess = TRUE, method = "probit", 
+                  control = list(maxit = 1000), na.action = na.exclude)
+    
+    # Store model
+    models[[outcome]] <- model
+    
+    # Print summary
+    cat("\nSummary for", outcome, ":\n")
+    print(summary(model))
+    
+    # Perform stepwise regression
+    step_model <- step(model, direction = "backward", trace = FALSE)
+    stepwise_models[[outcome]] <- step_model
+    
+    # Print stepwise summary
+    cat("\nStepwise Model Summary for", outcome, ":\n")
+    print(summary(step_model))
+    
+  }, error = function(e) {
+    cat("\nSkipping", outcome, "due to error:", conditionMessage(e), "\n")
+  })
+}
+
+```
+
+From the above, we can see that the models with the lowest AIC (using just main effects) are as follows:
+
+These outcomes are more likely to be reliable as we haven't removed a ton of data!
+
+Let's also look at the interactions between the demographic variables and check for multicollinearity. The vif() ouputs indicate that multicollinearity shouldn't be a problem.
+
+```{r}
+library(conflicted)
+conflict_prefer("filter", "dplyr")
+
+demographics <- c('Age', 'Gender', 'Music_listening', 'Practice', 'Floor')
+demographics_data <- dplyr::select(data1, all_of(demographics))
+
+# Convert categorical variables to numeric
+demographics_numeric <- demographics_data %>%
+  mutate(
+    Gender = as.numeric(factor(Gender)),
+    Music_listening = as.numeric(factor(Music_listening, ordered = TRUE)),  
+    Floor = as.numeric(factor(Floor))
+  ) 
+
+# Compute correlation matrix
+cor_matrix <- cor(demographics_numeric, use = "pairwise.complete.obs")
+
+# Plot heatmap
+corrplot(cor_matrix, method = "color", type = "lower", 
+         tl.col = "black", tl.srt = 45, addCoef.col = "white", 
+         col = colorRampPalette(c("blue", "white", "red"))(200))
+
+#Here's another way of visualising the interactions
+ggplot(data1, aes(x = Age, y = Practice, color = Floor)) +
+  geom_point(alpha = 0.6) +  
+  geom_smooth(method = "lm", se = FALSE, linetype = "dashed") +
+  facet_wrap(~ Floor) +
+  labs(title = "Age vs. Practice by Floor",
+       x = "Age", 
+       y = "Practice (Number of Years)") +
+  theme_minimal()
+
+
+#Checking for collinearity
+model1 <- lm(Age ~ Practice + Gender + Music_listening + Floor, data = demographics_numeric)
+model2 <- lm(Gender ~ Age + Practice + Music_listening + Floor, data = demographics_numeric)
+model3 <- lm(Practice ~ Age + Gender + Music_listening + Floor, data = demographics_numeric)
+model4 <- lm(Music_listening ~ Age + Gender + Practice + Floor, data = demographics_numeric)
+model5 <- lm(Floor ~ Age + Gender + Practice + Music_listening, data = demographics_numeric)
+vif(model1)
+vif(model2)
+vif(model3)
+vif(model4)
+vif(model5)
+```
+
+In the post on 'Ordinal regression: final models', we'll use the step() output to rerun some model visualisations.

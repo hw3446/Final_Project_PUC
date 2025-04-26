@@ -1,9 +1,6 @@
 ---
 title: "Ordinal regression: an overview"
 author: "Hannah Wilkie"
-date: "2025-04-22"
-categories: [news, code, analysis]
-image: "image.jpg"
 execute:
   warning: false
 ---
