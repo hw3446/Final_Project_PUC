@@ -4,7 +4,6 @@ format: html
 author: "Hannah Wilkie"
 execute:
   warning: false
-image: "Audience.jpg"
 ---
 
 ```{r}
