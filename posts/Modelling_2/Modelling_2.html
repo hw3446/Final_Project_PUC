@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Hannah Wilkie">
+
+<title>Ordinal regression: model Selection – Tutorial</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Tutorial</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Ordinal regression: model Selection</h1>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Hannah Wilkie </p>
+            </div>
+    </div>
+      
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MASS)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(corrplot)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(car)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>In this section, we’ll experiment with the step() function in R to help select ordinal regression models for our data.</p>
+<p>step() is not compatible with clm(), which is why we’ll use polr().</p>
+<p>The step() function starts with a full model containing all the possible main effects (in this case all the possible demographic variables). It tests different combinations of variables and then keeps the model with the lowest AIC.</p>
+<p>This is helpful when we’re dealing with lots of different outcome variables and lots of demographic inputs and we need to figure out which ones to use.</p>
+<p>Here’s how we’d run the step() function starting with all the demographic variables and using just fictional story as our outcome.</p>
+<p>First some data loading, and demographic variable tidying.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>data1 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://raw.githubusercontent.com/hw3446/Final_Project_PUC/main/posts/Dataset_overview/working_data/data.csv"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>data2 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://raw.githubusercontent.com/hw3446/Final_Project_PUC/main/posts/Dataset_overview/working_data/data2.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>outcome_vars <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Fictional_story"</span>, <span class="st">"Abstract_shapes"</span>, <span class="st">"Sensory_sensations"</span>, </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Life_experiences"</span>, <span class="st">"Media"</span>, <span class="st">"Music"</span>, <span class="st">"Future_plans"</span>, </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Building"</span>, <span class="st">"Everyday"</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Converting outcome variables to factors with consistent levels for each thought type</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>data1[outcome_vars] <span class="ot">&lt;-</span> <span class="fu">lapply</span>(data1[outcome_vars], factor, </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>                             <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Not at all"</span>, <span class="st">"A small amount of the time"</span>, </span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">"A moderate amount of the time"</span>, <span class="st">"Most of the time"</span>, </span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">"All of the time"</span>))</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>data2[outcome_vars] <span class="ot">&lt;-</span> <span class="fu">lapply</span>(data2[outcome_vars], factor, </span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>                             <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Not at all"</span>, <span class="st">"A small amount of the time"</span>, </span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">"A moderate amount of the time"</span>, <span class="st">"Most of the time"</span>, </span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">"All of the time"</span>))</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co">#Remaking the floor variable</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>data1 <span class="ot">&lt;-</span> data1 <span class="sc">%&gt;%</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Floor =</span> <span class="fu">ifelse</span>(Location <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"C"</span>, <span class="st">"D"</span>, <span class="st">"E"</span>, <span class="st">"F"</span>), <span class="st">"Downstairs"</span>, <span class="st">"Upstairs"</span>)) <span class="sc">%&gt;%</span> <span class="fu">relocate</span>(Floor, <span class="at">.after =</span> Location)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>data2 <span class="ot">&lt;-</span> data2 <span class="sc">%&gt;%</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Floor =</span> <span class="fu">ifelse</span>(Location <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"C"</span>, <span class="st">"D"</span>, <span class="st">"E"</span>, <span class="st">"F"</span>), <span class="st">"Downstairs"</span>, <span class="st">"Upstairs"</span>)) <span class="sc">%&gt;%</span> <span class="fu">relocate</span>(Floor, <span class="at">.after =</span> Location)</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="co">#Making sure demographic variables are classed in the right way.</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>data1<span class="sc">$</span>Age <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(data1<span class="sc">$</span>Age)</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>data2<span class="sc">$</span>Age <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(data2<span class="sc">$</span>Age)</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>data1<span class="sc">$</span>Practice <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">as.character</span>(data1<span class="sc">$</span>Practice))</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>data2<span class="sc">$</span>Practice <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">as.character</span>(data2<span class="sc">$</span>Practice))</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>data1<span class="sc">$</span>Gender <span class="ot">&lt;-</span> <span class="fu">factor</span>(data1<span class="sc">$</span>Gender,  <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">'Male'</span>, <span class="st">'Female'</span>, <span class="st">'Other'</span>))</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>data2<span class="sc">$</span>Gender <span class="ot">&lt;-</span> <span class="fu">factor</span>(data2<span class="sc">$</span>Gender,  <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">'Male'</span>, <span class="st">'Female'</span>, <span class="st">'Other'</span>))</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>data1<span class="sc">$</span>Music_listening <span class="ot">&lt;-</span> <span class="fu">factor</span>(data1<span class="sc">$</span>Music_listening, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">'Very rarely'</span>, <span class="st">'Somewhat rarely'</span>, <span class="st">'Moderately frequently'</span>, <span class="st">'Frequently'</span>, <span class="st">'Very frequently'</span>))</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>data2<span class="sc">$</span>Music_listening <span class="ot">&lt;-</span> <span class="fu">factor</span>(data2<span class="sc">$</span>Music_listening, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">'Very rarely'</span>, <span class="st">'Somewhat rarely'</span>, <span class="st">'Moderately frequently'</span>, <span class="st">'Frequently'</span>, <span class="st">'Very frequently'</span>))</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>data1<span class="sc">$</span>Floor <span class="ot">&lt;-</span> <span class="fu">factor</span>(data1<span class="sc">$</span>Floor, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">'Downstairs'</span>, <span class="st">'Upstairs'</span>))</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>data2<span class="sc">$</span>Floor <span class="ot">&lt;-</span> <span class="fu">factor</span>(data2<span class="sc">$</span>Floor, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">'Downstairs'</span>, <span class="st">'Upstairs'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We have some NAs in our dataframe, so before running the models, we need to figure out what to do with these.</p>
+<p>Let’s get a map of our missing data:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Amelia)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>demographics_outcomes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">'Age'</span>, <span class="st">'Gender'</span>, <span class="st">'Music_listening'</span>, <span class="st">'Practice'</span>, <span class="st">'Floor'</span>, <span class="st">"Fictional_story"</span>, <span class="st">"Abstract_shapes"</span>, <span class="st">"Sensory_sensations"</span>, </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Life_experiences"</span>, <span class="st">"Media"</span>, <span class="st">"Music"</span>, <span class="st">"Future_plans"</span>, </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Building"</span>, <span class="st">"Everyday"</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>dem_out <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">select</span>(data1, <span class="fu">all_of</span>(demographics_outcomes))</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="fu">missmap</span>(dem_out)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Modelling_2_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We can hypothesise that the data is MCAR (missing completely at random), i.e.&nbsp;that missing values aren’t correlated with any particular variables. Let’s test this.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(naniar)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mcar_test</span>(dem_out)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 4
+  statistic    df p.value missing.patterns
+      &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;            &lt;int&gt;
+1      250.   237   0.265               23</code></pre>
+</div>
+</div>
+<p>p &gt; 0.05, so there is insufficient evidence to reject the null hypothesis that the data is MCAR.</p>
+<p>Based on this, we can use imputation to deal with the NAs.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mice)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>imputed_data1 <span class="ot">&lt;-</span> <span class="fu">mice</span>(data1, <span class="at">m =</span> <span class="dv">5</span>, <span class="at">method =</span> <span class="st">'pmm'</span>, <span class="at">seed =</span> <span class="dv">123</span>, <span class="at">print =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>completed_data1 <span class="ot">&lt;-</span> <span class="fu">complete</span>(imputed_data1, <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s now run the step() function with our imputed data for fictional story.</p>
+<ol type="1">
+<li>Start by specifying the model with with maximum number of demographic inputs.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>model_fiction_imp <span class="ot">&lt;-</span> <span class="fu">polr</span>(Fictional_story <span class="sc">~</span> Age <span class="sc">+</span> Gender <span class="sc">+</span> Music_listening <span class="sc">+</span> Practice <span class="sc">+</span> Floor, </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">data =</span> completed_data1, <span class="at">Hess =</span> <span class="cn">TRUE</span>, <span class="at">method =</span> <span class="st">"probit"</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>stepwise_model_imp <span class="ot">&lt;-</span> <span class="fu">step</span>(model_fiction_imp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Start:  AIC=488.65
+Fictional_story ~ Age + Gender + Music_listening + Practice + 
+    Floor
+
+                  Df    AIC
+- Gender           2 485.33
+- Practice         1 486.68
+- Floor            1 486.78
+- Music_listening  4 487.64
+&lt;none&gt;               488.65
+- Age              1 493.74
+
+Step:  AIC=485.33
+Fictional_story ~ Age + Music_listening + Practice + Floor
+
+                  Df    AIC
+- Practice         1 483.33
+- Floor            1 483.54
+- Music_listening  4 484.98
+&lt;none&gt;               485.33
+- Age              1 491.03
+
+Step:  AIC=483.33
+Fictional_story ~ Age + Music_listening + Floor
+
+                  Df    AIC
+- Floor            1 481.56
+- Music_listening  4 483.20
+&lt;none&gt;               483.33
+- Age              1 489.20
+
+Step:  AIC=481.56
+Fictional_story ~ Age + Music_listening
+
+                  Df    AIC
+- Music_listening  4 481.22
+&lt;none&gt;               481.56
+- Age              1 487.20
+
+Step:  AIC=481.22
+Fictional_story ~ Age
+
+       Df    AIC
+&lt;none&gt;    481.22
+- Age   1 485.74</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(stepwise_model_imp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Call:
+polr(formula = Fictional_story ~ Age, data = completed_data1, 
+    Hess = TRUE, method = "probit")
+
+Coefficients:
+       Value Std. Error t value
+Age -0.01087   0.004265  -2.549
+
+Intercepts:
+                                                         Value   Std. Error
+Not at all|A small amount of the time                    -0.8932  0.2658   
+A small amount of the time|A moderate amount of the time -0.2880  0.2593   
+A moderate amount of the time|Most of the time            0.2708  0.2634   
+Most of the time|All of the time                          1.2830  0.3059   
+                                                         t value
+Not at all|A small amount of the time                    -3.3605
+A small amount of the time|A moderate amount of the time -1.1109
+A moderate amount of the time|Most of the time            1.0279
+Most of the time|All of the time                          4.1937
+
+Residual Deviance: 471.2221 
+AIC: 481.2221 </code></pre>
+</div>
+</div>
+<p>step() ran through all the possible demographics to find the model with the lowest AIC. In this case the most successful model was one with just age as a demographic input.</p>
+<p>We can run the step() function looping through all the possible outcome variables using the imputed data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># List to store results</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>models <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>stepwise_models <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Loop through selected outcomes</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (outcome <span class="cf">in</span> outcome_vars) {</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">paste</span>(outcome, <span class="st">"~ Age + Gender + Music_listening + Practice + Floor"</span>))</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tryCatch</span>({</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Fit proportional odds model</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    model <span class="ot">&lt;-</span> <span class="fu">polr</span>(formula, <span class="at">data =</span> completed_data1, <span class="at">Hess =</span> <span class="cn">TRUE</span>, <span class="at">method =</span> <span class="st">"probit"</span>, </span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>                  <span class="at">control =</span> <span class="fu">list</span>(<span class="at">maxit =</span> <span class="dv">1000</span>), <span class="at">na.action =</span> na.exclude)</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Store model</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    models[[outcome]] <span class="ot">&lt;-</span> model</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Print summary</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Summary for"</span>, outcome, <span class="st">":</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span>(<span class="fu">summary</span>(model))</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Perform stepwise regression</span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>    step_model <span class="ot">&lt;-</span> <span class="fu">step</span>(model, <span class="at">direction =</span> <span class="st">"backward"</span>, <span class="at">trace =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>    stepwise_models[[outcome]] <span class="ot">&lt;-</span> step_model</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Print stepwise summary</span></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Stepwise Model Summary for"</span>, outcome, <span class="st">":</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span>(<span class="fu">summary</span>(step_model))</span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>  }, <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Skipping"</span>, outcome, <span class="st">"due to error:"</span>, <span class="fu">conditionMessage</span>(e), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Summary for Fictional_story :
+Call:
+polr(formula = formula, data = completed_data1, control = list(maxit = 1000), 
+    na.action = na.exclude, Hess = TRUE, method = "probit")
+
+Coefficients:
+                                          Value Std. Error t value
+Age                                  -0.0119694   0.004507 -2.6559
+GenderFemale                         -0.1304844   0.171772 -0.7596
+GenderOther                           0.2866160   1.142658  0.2508
+Music_listeningSomewhat rarely        0.3869493   0.818075  0.4730
+Music_listeningModerately frequently  0.1100234   0.760115  0.1447
+Music_listeningFrequently            -0.3969950   0.747131 -0.5314
+Music_listeningVery frequently       -0.2231091   0.745208 -0.2994
+Practice                             -0.0006767   0.004035 -0.1677
+FloorUpstairs                        -0.0696105   0.189520 -0.3673
+
+Intercepts:
+                                                         Value   Std. Error
+Not at all|A small amount of the time                    -1.2489  0.7788   
+A small amount of the time|A moderate amount of the time -0.6293  0.7734   
+A moderate amount of the time|Most of the time           -0.0534  0.7759   
+Most of the time|All of the time                          1.0040  0.7985   
+                                                         t value
+Not at all|A small amount of the time                    -1.6036
+A small amount of the time|A moderate amount of the time -0.8137
+A moderate amount of the time|Most of the time           -0.0688
+Most of the time|All of the time                          1.2573
+
+Residual Deviance: 462.6495 
+AIC: 488.6495 
+
+Stepwise Model Summary for Fictional_story :
+Call:
+polr(formula = Fictional_story ~ Age, data = completed_data1, 
+    control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, 
+    method = "probit")
+
+Coefficients:
+       Value Std. Error t value
+Age -0.01087   0.004265  -2.549
+
+Intercepts:
+                                                         Value   Std. Error
+Not at all|A small amount of the time                    -0.8932  0.2658   
+A small amount of the time|A moderate amount of the time -0.2880  0.2593   
+A moderate amount of the time|Most of the time            0.2708  0.2634   
+Most of the time|All of the time                          1.2830  0.3059   
+                                                         t value
+Not at all|A small amount of the time                    -3.3605
+A small amount of the time|A moderate amount of the time -1.1109
+A moderate amount of the time|Most of the time            1.0279
+Most of the time|All of the time                          4.1937
+
+Residual Deviance: 471.2221 
+AIC: 481.2221 
+
+Summary for Abstract_shapes :
+Call:
+polr(formula = formula, data = completed_data1, control = list(maxit = 1000), 
+    na.action = na.exclude, Hess = TRUE, method = "probit")
+
+Coefficients:
+                                         Value Std. Error  t value
+Age                                  -0.007717   0.004651 -1.65937
+GenderFemale                          0.139259   0.181091  0.76900
+GenderOther                           0.404613   1.124977  0.35966
+Music_listeningSomewhat rarely       -0.232743   0.895790 -0.25982
+Music_listeningModerately frequently -0.061782   0.833906 -0.07409
+Music_listeningFrequently            -0.080580   0.820245 -0.09824
+Music_listeningVery frequently        0.028789   0.817584  0.03521
+Practice                              0.002845   0.004105  0.69306
+FloorUpstairs                        -0.062090   0.196443 -0.31607
+
+Intercepts:
+                                                         Value   Std. Error
+Not at all|A small amount of the time                    -0.2575  0.8396   
+A small amount of the time|A moderate amount of the time  0.4112  0.8386   
+A moderate amount of the time|Most of the time            1.1371  0.8439   
+Most of the time|All of the time                          2.1552  0.9067   
+                                                         t value
+Not at all|A small amount of the time                    -0.3067
+A small amount of the time|A moderate amount of the time  0.4904
+A moderate amount of the time|Most of the time            1.3474
+Most of the time|All of the time                          2.3769
+
+Residual Deviance: 382.2277 
+AIC: 408.2277 
+
+Stepwise Model Summary for Abstract_shapes :
+Call:
+polr(formula = Abstract_shapes ~ Age, data = completed_data1, 
+    control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, 
+    method = "probit")
+
+Coefficients:
+        Value Std. Error t value
+Age -0.007516   0.004429  -1.697
+
+Intercepts:
+                                                         Value   Std. Error
+Not at all|A small amount of the time                    -0.2910  0.2718   
+A small amount of the time|A moderate amount of the time  0.3716  0.2720   
+A moderate amount of the time|Most of the time            1.0905  0.2899   
+Most of the time|All of the time                          2.1051  0.4312   
+                                                         t value
+Not at all|A small amount of the time                    -1.0705
+A small amount of the time|A moderate amount of the time  1.3665
+A moderate amount of the time|Most of the time            3.7619
+Most of the time|All of the time                          4.8814
+
+Residual Deviance: 384.1321 
+AIC: 394.1321 
+
+Summary for Sensory_sensations :
+Call:
+polr(formula = formula, data = completed_data1, control = list(maxit = 1000), 
+    na.action = na.exclude, Hess = TRUE, method = "probit")
+
+Coefficients:
+                                         Value Std. Error t value
+Age                                   0.001477   0.005143  0.2872
+GenderFemale                          0.097504   0.193062  0.5050
+GenderOther                           0.989921   1.146929  0.8631
+Music_listeningSomewhat rarely        3.475040   0.333934 10.4064
+Music_listeningModerately frequently  3.440302   0.209330 16.4348
+Music_listeningFrequently             3.595043   0.174398 20.6141
+Music_listeningVery frequently        3.525095   0.167035 21.1039
+Practice                             -0.003816   0.004481 -0.8517
+FloorUpstairs                         0.056182   0.211594  0.2655
+
+Intercepts:
+                                                         Value   Std. Error
+Not at all|A small amount of the time                     4.0713  0.3210   
+A small amount of the time|A moderate amount of the time  4.8295  0.3339   
+A moderate amount of the time|Most of the time            5.4624  0.3668   
+Most of the time|All of the time                          9.6701  0.3668   
+                                                         t value
+Not at all|A small amount of the time                    12.6818
+A small amount of the time|A moderate amount of the time 14.4651
+A moderate amount of the time|Most of the time           14.8929
+Most of the time|All of the time                         26.3651
+
+Residual Deviance: 308.6269 
+AIC: 334.6269 
+
+Stepwise Model Summary for Sensory_sensations :
+Call:
+polr(formula = Sensory_sensations ~ 1, data = completed_data1, 
+    control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, 
+    method = "probit")
+
+No coefficients
+
+Intercepts:
+                                                         Value   Std. Error
+Not at all|A small amount of the time                     0.4361  0.0998   
+A small amount of the time|A moderate amount of the time  1.1833  0.1254   
+A moderate amount of the time|Most of the time            1.8055  0.1821   
+Most of the time|All of the time                          5.2824 58.3345   
+                                                         t value
+Not at all|A small amount of the time                     4.3695
+A small amount of the time|A moderate amount of the time  9.4335
+A moderate amount of the time|Most of the time            9.9160
+Most of the time|All of the time                          0.0906
+
+Residual Deviance: 312.1081 
+AIC: 320.1081 
+
+Summary for Life_experiences :
+Call:
+polr(formula = formula, data = completed_data1, control = list(maxit = 1000), 
+    na.action = na.exclude, Hess = TRUE, method = "probit")
+
+Coefficients:
+                                          Value Std. Error  t value
+Age                                  -0.0185912   0.004496 -4.13501
+GenderFemale                          0.3338443   0.168246  1.98426
+GenderOther                           0.0435836   1.130373  0.03856
+Music_listeningSomewhat rarely       -0.8386026   0.838070 -1.00064
+Music_listeningModerately frequently -0.5336945   0.783171 -0.68145
+Music_listeningFrequently            -0.8846652   0.771458 -1.14674
+Music_listeningVery frequently       -0.7085922   0.768244 -0.92235
+Practice                              0.0003421   0.003938  0.08688
+FloorUpstairs                         0.0887653   0.184924  0.48001
+
+Intercepts:
+                                                         Value   Std. Error
+Not at all|A small amount of the time                    -2.3465  0.8069   
+A small amount of the time|A moderate amount of the time -1.5697  0.8002   
+A moderate amount of the time|Most of the time           -0.6085  0.7931   
+Most of the time|All of the time                          0.6236  0.8114   
+                                                         t value
+Not at all|A small amount of the time                    -2.9080
+A small amount of the time|A moderate amount of the time -1.9615
+A moderate amount of the time|Most of the time           -0.7673
+Most of the time|All of the time                          0.7685
+
+Residual Deviance: 461.8797 
+AIC: 487.8797 
+
+Stepwise Model Summary for Life_experiences :
+Call:
+polr(formula = Life_experiences ~ Age + Gender, data = completed_data1, 
+    control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, 
+    method = "probit")
+
+Coefficients:
+                Value Std. Error t value
+Age          -0.01837   0.004339 -4.2348
+GenderFemale  0.35029   0.166603  2.1025
+GenderOther  -0.12500   1.061700 -0.1177
+
+Intercepts:
+                                                         Value   Std. Error
+Not at all|A small amount of the time                    -1.6660  0.2969   
+A small amount of the time|A moderate amount of the time -0.8944  0.2869   
+A moderate amount of the time|Most of the time            0.0565  0.2810   
+Most of the time|All of the time                          1.2609  0.3245   
+                                                         t value
+Not at all|A small amount of the time                    -5.6112
+A small amount of the time|A moderate amount of the time -3.1173
+A moderate amount of the time|Most of the time            0.2009
+Most of the time|All of the time                          3.8851
+
+Residual Deviance: 465.5019 
+AIC: 479.5019 
+
+Summary for Media :
+Call:
+polr(formula = formula, data = completed_data1, control = list(maxit = 1000), 
+    na.action = na.exclude, Hess = TRUE, method = "probit")
+
+Coefficients:
+                                         Value Std. Error  t value
+Age                                  -0.010872   0.004946 -2.19822
+GenderFemale                         -0.101713   0.190530 -0.53384
+GenderOther                           0.247960   1.133610  0.21873
+Music_listeningSomewhat rarely        0.667168   0.899813  0.74145
+Music_listeningModerately frequently -0.078588   0.850081 -0.09245
+Music_listeningFrequently            -0.083448   0.835649 -0.09986
+Music_listeningVery frequently        0.039282   0.830912  0.04728
+Practice                             -0.002154   0.004500 -0.47868
+FloorUpstairs                         0.114767   0.217220  0.52834
+
+Intercepts:
+                                                         Value   Std. Error
+Not at all|A small amount of the time                    -0.2502  0.8738   
+A small amount of the time|A moderate amount of the time  0.3088  0.8743   
+A moderate amount of the time|Most of the time            1.1306  0.8850   
+Most of the time|All of the time                          6.2508  0.8850   
+                                                         t value
+Not at all|A small amount of the time                    -0.2863
+A small amount of the time|A moderate amount of the time  0.3532
+A moderate amount of the time|Most of the time            1.2775
+Most of the time|All of the time                          7.0632
+
+Residual Deviance: 329.2396 
+AIC: 355.2396 
+
+Stepwise Model Summary for Media :
+Call:
+polr(formula = Media ~ Age, data = completed_data1, control = list(maxit = 1000), 
+    na.action = na.exclude, Hess = TRUE, method = "probit")
+
+Coefficients:
+       Value Std. Error t value
+Age -0.01192   0.004678  -2.549
+
+Intercepts:
+                                                         Value   Std. Error
+Not at all|A small amount of the time                    -0.3201  0.2811   
+A small amount of the time|A moderate amount of the time  0.2227  0.2797   
+A moderate amount of the time|Most of the time            1.0178  0.3035   
+Most of the time|All of the time                          4.0381 14.8246   
+                                                         t value
+Not at all|A small amount of the time                    -1.1387
+A small amount of the time|A moderate amount of the time  0.7964
+A moderate amount of the time|Most of the time            3.3541
+Most of the time|All of the time                          0.2724
+
+Residual Deviance: 334.9296 
+AIC: 344.9296 
+
+Summary for Music :
+Call:
+polr(formula = formula, data = completed_data1, control = list(maxit = 1000), 
+    na.action = na.exclude, Hess = TRUE, method = "probit")
+
+Coefficients:
+                                         Value Std. Error t value
+Age                                  -0.004825   0.004461 -1.0817
+GenderFemale                          0.252545   0.169562  1.4894
+GenderOther                           0.129646   1.163197  0.1115
+Music_listeningSomewhat rarely        1.678389   0.829738  2.0228
+Music_listeningModerately frequently  1.323757   0.769981  1.7192
+Music_listeningFrequently             1.412387   0.759212  1.8603
+Music_listeningVery frequently        2.019221   0.761680  2.6510
+Practice                              0.010954   0.004055  2.7015
+FloorUpstairs                        -0.052933   0.187118 -0.2829
+
+Intercepts:
+                                                         Value   Std. Error
+Not at all|A small amount of the time                    -0.3323  0.7888   
+A small amount of the time|A moderate amount of the time  0.3538  0.7789   
+A moderate amount of the time|Most of the time            1.1955  0.7861   
+Most of the time|All of the time                          2.4851  0.7969   
+                                                         t value
+Not at all|A small amount of the time                    -0.4213
+A small amount of the time|A moderate amount of the time  0.4543
+A moderate amount of the time|Most of the time            1.5209
+Most of the time|All of the time                          3.1182
+
+Residual Deviance: 430.3254 
+AIC: 456.3254 
+
+Stepwise Model Summary for Music :
+Call:
+polr(formula = Music ~ Music_listening + Practice, data = completed_data1, 
+    control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, 
+    method = "probit")
+
+Coefficients:
+                                        Value Std. Error t value
+Music_listeningSomewhat rarely       1.582661    0.81114   1.951
+Music_listeningModerately frequently 1.199592    0.75908   1.580
+Music_listeningFrequently            1.297897    0.75320   1.723
+Music_listeningVery frequently       1.915436    0.75248   2.545
+Practice                             0.009943    0.00397   2.504
+
+Intercepts:
+                                                         Value   Std. Error
+Not at all|A small amount of the time                    -0.2466  0.7563   
+A small amount of the time|A moderate amount of the time  0.4116  0.7469   
+A moderate amount of the time|Most of the time            1.2443  0.7539   
+Most of the time|All of the time                          2.5247  0.7651   
+                                                         t value
+Not at all|A small amount of the time                    -0.3261
+A small amount of the time|A moderate amount of the time  0.5511
+A moderate amount of the time|Most of the time            1.6505
+Most of the time|All of the time                          3.3000
+
+Residual Deviance: 433.7725 
+AIC: 451.7725 
+
+Summary for Future_plans :
+Call:
+polr(formula = formula, data = completed_data1, control = list(maxit = 1000), 
+    na.action = na.exclude, Hess = TRUE, method = "probit")
+
+Coefficients:
+                                          Value Std. Error t value
+Age                                  -0.0297459   0.004786 -6.2148
+GenderFemale                         -0.1171670   0.173718 -0.6745
+GenderOther                          -0.9751986   1.129557 -0.8633
+Music_listeningSomewhat rarely        0.1019078   0.831239  0.1226
+Music_listeningModerately frequently -0.1386299   0.773797 -0.1792
+Music_listeningFrequently            -0.5641257   0.760582 -0.7417
+Music_listeningVery frequently       -0.4006497   0.759090 -0.5278
+Practice                              0.0004275   0.004183  0.1022
+FloorUpstairs                        -0.0828124   0.192812 -0.4295
+
+Intercepts:
+                                                         Value   Std. Error
+Not at all|A small amount of the time                    -2.5309  0.8043   
+A small amount of the time|A moderate amount of the time -1.7781  0.7948   
+A moderate amount of the time|Most of the time           -0.9118  0.7877   
+Most of the time|All of the time                          0.0447  0.8069   
+                                                         t value
+Not at all|A small amount of the time                    -3.1466
+A small amount of the time|A moderate amount of the time -2.2372
+A moderate amount of the time|Most of the time           -1.1576
+Most of the time|All of the time                          0.0554
+
+Residual Deviance: 425.868 
+AIC: 451.868 
+
+Stepwise Model Summary for Future_plans :
+Call:
+polr(formula = Future_plans ~ Age, data = completed_data1, control = list(maxit = 1000), 
+    na.action = na.exclude, Hess = TRUE, method = "probit")
+
+Coefficients:
+      Value Std. Error t value
+Age -0.0279    0.00454  -6.146
+
+Intercepts:
+                                                         Value   Std. Error
+Not at all|A small amount of the time                    -1.9467  0.2897   
+A small amount of the time|A moderate amount of the time -1.2071  0.2763   
+A moderate amount of the time|Most of the time           -0.3564  0.2669   
+Most of the time|All of the time                          0.5703  0.2977   
+                                                         t value
+Not at all|A small amount of the time                    -6.7195
+A small amount of the time|A moderate amount of the time -4.3689
+A moderate amount of the time|Most of the time           -1.3353
+Most of the time|All of the time                          1.9154
+
+Residual Deviance: 431.3382 
+AIC: 441.3382 
+
+Summary for Building :
+Call:
+polr(formula = formula, data = completed_data1, control = list(maxit = 1000), 
+    na.action = na.exclude, Hess = TRUE, method = "probit")
+
+Coefficients:
+                                         Value Std. Error    t value
+Age                                  -0.014909  4.707e-03 -3.167e+00
+GenderFemale                         -0.325161  1.791e-01 -1.816e+00
+GenderOther                          -4.624617  5.802e-06 -7.970e+05
+Music_listeningSomewhat rarely        3.395080  3.271e-01  1.038e+01
+Music_listeningModerately frequently  3.770237  1.930e-01  1.954e+01
+Music_listeningFrequently             3.978579  1.664e-01  2.390e+01
+Music_listeningVery frequently        4.127860  1.606e-01  2.571e+01
+Practice                             -0.001467  4.216e-03 -3.479e-01
+FloorUpstairs                         0.331029  2.039e-01  1.623e+00
+
+Intercepts:
+                                                         Value       
+Not at all|A small amount of the time                          3.0040
+A small amount of the time|A moderate amount of the time       4.1311
+A moderate amount of the time|Most of the time                 5.0114
+Most of the time|All of the time                               5.5848
+                                                         Std. Error  
+Not at all|A small amount of the time                          0.2968
+A small amount of the time|A moderate amount of the time       0.2997
+A moderate amount of the time|Most of the time                 0.3223
+Most of the time|All of the time                               0.3841
+                                                         t value     
+Not at all|A small amount of the time                         10.1222
+A small amount of the time|A moderate amount of the time      13.7831
+A moderate amount of the time|Most of the time                15.5503
+Most of the time|All of the time                              14.5407
+
+Residual Deviance: 359.3626 
+AIC: 385.3626 
+
+Stepwise Model Summary for Building :
+Call:
+polr(formula = Building ~ Age + Gender + Music_listening + Floor, 
+    data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, 
+    Hess = TRUE, method = "probit")
+
+Coefficients:
+                                        Value Std. Error    t value
+Age                                  -0.01506  0.0046870 -3.213e+00
+GenderFemale                         -0.32002  0.1784391 -1.793e+00
+GenderOther                          -4.41799  0.0000141 -3.133e+05
+Music_listeningSomewhat rarely        3.48454  0.3274930  1.064e+01
+Music_listeningModerately frequently  3.86134  0.1926620  2.004e+01
+Music_listeningFrequently             4.05756  0.1647944  2.462e+01
+Music_listeningVery frequently        4.20895  0.1596560  2.636e+01
+FloorUpstairs                         0.32172  0.2020685  1.592e+00
+
+Intercepts:
+                                                         Value       
+Not at all|A small amount of the time                          3.0991
+A small amount of the time|A moderate amount of the time       4.2254
+A moderate amount of the time|Most of the time                 5.1035
+Most of the time|All of the time                               5.6774
+                                                         Std. Error  
+Not at all|A small amount of the time                          0.2959
+A small amount of the time|A moderate amount of the time       0.2990
+A moderate amount of the time|Most of the time                 0.3218
+Most of the time|All of the time                               0.3839
+                                                         t value     
+Not at all|A small amount of the time                         10.4747
+A small amount of the time|A moderate amount of the time      14.1310
+A moderate amount of the time|Most of the time                15.8587
+Most of the time|All of the time                              14.7871
+
+Residual Deviance: 359.4838 
+AIC: 383.4838 
+
+Summary for Everyday :
+Call:
+polr(formula = formula, data = completed_data1, control = list(maxit = 1000), 
+    na.action = na.exclude, Hess = TRUE, method = "probit")
+
+Coefficients:
+                                         Value Std. Error  t value
+Age                                  -0.016147   0.004533 -3.56225
+GenderFemale                          0.044141   0.171463  0.25744
+GenderOther                           0.039425   1.156164  0.03410
+Music_listeningSomewhat rarely       -0.629524   0.855960 -0.73546
+Music_listeningModerately frequently  0.117966   0.785209  0.15024
+Music_listeningFrequently            -0.158050   0.773739 -0.20427
+Music_listeningVery frequently        0.083396   0.771575  0.10809
+Practice                             -0.005048   0.004110 -1.22843
+FloorUpstairs                        -0.015218   0.189961 -0.08011
+
+Intercepts:
+                                                         Value   Std. Error
+Not at all|A small amount of the time                    -1.4546  0.8036   
+A small amount of the time|A moderate amount of the time -0.3433  0.7996   
+A moderate amount of the time|Most of the time            0.4885  0.8054   
+Most of the time|All of the time                          1.1002  0.8209   
+                                                         t value
+Not at all|A small amount of the time                    -1.8101
+A small amount of the time|A moderate amount of the time -0.4294
+A moderate amount of the time|Most of the time            0.6065
+Most of the time|All of the time                          1.3402
+
+Residual Deviance: 416.4516 
+AIC: 442.4516 
+
+Stepwise Model Summary for Everyday :
+Call:
+polr(formula = Everyday ~ Age, data = completed_data1, control = list(maxit = 1000), 
+    na.action = na.exclude, Hess = TRUE, method = "probit")
+
+Coefficients:
+       Value Std. Error t value
+Age -0.01527   0.004303  -3.549
+
+Intercepts:
+                                                         Value   Std. Error
+Not at all|A small amount of the time                    -1.3073  0.2741   
+A small amount of the time|A moderate amount of the time -0.2215  0.2642   
+A moderate amount of the time|Most of the time            0.6075  0.2718   
+Most of the time|All of the time                          1.2102  0.3072   
+                                                         t value
+Not at all|A small amount of the time                    -4.7696
+A small amount of the time|A moderate amount of the time -0.8384
+A moderate amount of the time|Most of the time            2.2351
+Most of the time|All of the time                          3.9400
+
+Residual Deviance: 423.2318 
+AIC: 433.2318 </code></pre>
+</div>
+</div>
+<p>From the above, we can see that the models with the lowest AIC (using just main effects) are as follows:</p>
+<p>Fictional story: polr(formula = Fictional_story ~ Age, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “probit”)</p>
+<p>Abstract shapes: polr(formula = Abstract_shapes ~ Age, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “probit”)</p>
+<p>Sensory sensations: polr(formula = Sensory_sensations ~ 1, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “probit”)</p>
+<p>Life experiences: polr(formula = Life_experiences ~ Age + Gender, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “probit”)</p>
+<p>Media: polr(formula = Media ~ Age, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “probit”)</p>
+<p>Music: polr(formula = Music ~ Music_listening + Practice, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “probit”)</p>
+<p>Future plans: polr(formula = Future_plans ~ Age, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “probit”)</p>
+<p>Building: polr(formula = Building ~ Age + Gender + Music_listening + Floor, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “probit”)</p>
+<p>Everyday: polr(formula = Everyday ~ Age, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “probit”)</p>
+<p>Let’s also look at the interactions between the demographic variables and check for multicollinearity.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(conflicted)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">conflict_prefer</span>(<span class="st">"filter"</span>, <span class="st">"dplyr"</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>demographics <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">'Age'</span>, <span class="st">'Gender'</span>, <span class="st">'Music_listening'</span>, <span class="st">'Practice'</span>, <span class="st">'Floor'</span>)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>demographics_data <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">select</span>(data1, <span class="fu">all_of</span>(demographics))</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert categorical variables to numeric</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>demographics_numeric <span class="ot">&lt;-</span> demographics_data <span class="sc">%&gt;%</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">Gender =</span> <span class="fu">as.numeric</span>(<span class="fu">factor</span>(Gender)),</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">Music_listening =</span> <span class="fu">as.numeric</span>(<span class="fu">factor</span>(Music_listening, <span class="at">ordered =</span> <span class="cn">TRUE</span>)),  </span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">Floor =</span> <span class="fu">as.numeric</span>(<span class="fu">factor</span>(Floor))</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  ) </span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute correlation matrix</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>cor_matrix <span class="ot">&lt;-</span> <span class="fu">cor</span>(demographics_numeric, <span class="at">use =</span> <span class="st">"pairwise.complete.obs"</span>)</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot heatmap</span></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a><span class="fu">corrplot</span>(cor_matrix, <span class="at">method =</span> <span class="st">"color"</span>, <span class="at">type =</span> <span class="st">"lower"</span>, </span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">tl.col =</span> <span class="st">"black"</span>, <span class="at">tl.srt =</span> <span class="dv">45</span>, <span class="at">addCoef.col =</span> <span class="st">"white"</span>, </span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>         <span class="at">col =</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">"blue"</span>, <span class="st">"white"</span>, <span class="st">"red"</span>))(<span class="dv">200</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Modelling_2_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Here's another way of visualising the interactions</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(data1, <span class="fu">aes</span>(<span class="at">x =</span> Age, <span class="at">y =</span> Practice, <span class="at">color =</span> Floor)) <span class="sc">+</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span>  </span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Floor) <span class="sc">+</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Age vs. Practice by Floor"</span>,</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Age"</span>, </span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Practice (Number of Years)"</span>) <span class="sc">+</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Modelling_2_files/figure-html/unnamed-chunk-9-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Checking for collinearity</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>model1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(Age <span class="sc">~</span> Practice <span class="sc">+</span> Gender <span class="sc">+</span> Music_listening <span class="sc">+</span> Floor, <span class="at">data =</span> demographics_numeric)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>model2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(Gender <span class="sc">~</span> Age <span class="sc">+</span> Practice <span class="sc">+</span> Music_listening <span class="sc">+</span> Floor, <span class="at">data =</span> demographics_numeric)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>model3 <span class="ot">&lt;-</span> <span class="fu">lm</span>(Practice <span class="sc">~</span> Age <span class="sc">+</span> Gender <span class="sc">+</span> Music_listening <span class="sc">+</span> Floor, <span class="at">data =</span> demographics_numeric)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>model4 <span class="ot">&lt;-</span> <span class="fu">lm</span>(Music_listening <span class="sc">~</span> Age <span class="sc">+</span> Gender <span class="sc">+</span> Practice <span class="sc">+</span> Floor, <span class="at">data =</span> demographics_numeric)</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>model5 <span class="ot">&lt;-</span> <span class="fu">lm</span>(Floor <span class="sc">~</span> Age <span class="sc">+</span> Gender <span class="sc">+</span> Practice <span class="sc">+</span> Music_listening, <span class="at">data =</span> demographics_numeric)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="fu">vif</span>(model1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       Practice          Gender Music_listening           Floor 
+       1.036377        1.002153        1.034110        1.003875 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vif</span>(model2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            Age        Practice Music_listening           Floor 
+       1.086216        1.067477        1.034662        1.059068 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vif</span>(model3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            Age          Gender Music_listening           Floor 
+       1.064866        1.011938        1.004652        1.051720 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vif</span>(model4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     Age   Gender Practice    Floor 
+1.096117 1.011828 1.036402 1.058475 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vif</span>(model5)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            Age          Gender        Practice Music_listening 
+       1.039690        1.011967        1.060100        1.034224 </code></pre>
+</div>
+</div>
+<p>All vif() outputs are close to 1, indicating that multicollinearity shouldn’t be a problem.</p>
+<p>In the post on ‘Ordinal regression: final models’, we’ll use these step() results to run some final model visualisations.</p>
+
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
