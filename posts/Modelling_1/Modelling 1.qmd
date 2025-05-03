@@ -128,17 +128,15 @@ ggplot(fiction_age_grouped, aes(x = Fictional_story, y = Percentage, fill = Age_
 
 ```
 
-To create an ordinal regression model, we use the clm() function. Here's a simple example showing the relationship between age and likelihood of imagining a fictional story based on data from the first half of the concert.
+To create an ordinal regression model, we can use the polr() function. An alternative is clm(), but we won't be using that here for reasons that will become clear in the next post. Here's a simple example showing the relationship between age and likelihood of imagining a fictional story based on data from the first half of the concert.
 
 ```{r}
-model_fiction_age <- clm(Fictional_story ~ Age, data = data1, Hess = TRUE)
+model_fiction_age <- polr(Fictional_story ~ Age, data = data1, Hess = TRUE)
 
 model_fiction_age %>% 
   tidy() %>%
   kable()
 ```
-
-Based on the model outcome for the 'Age' term (estimate = -0.0119), we can see that as age increases, respondents are less likely to choose higher categories (e.g. less likely to report experiencing a fictional story frequently). However, p = 0.214, so this is not statistically significant.
 
 `ggemmeans` can be used to visualise the model.
 
@@ -175,7 +173,8 @@ MODEL COMPARISONS
 Let's do some comparing comparison now. Here we're going to integrate age and gender into the same model.
 
 ```{r}
-Fiction_int = clm(Fictional_story ~ Gender*Age, data=data1)
+
+Fiction_int <- polr(Fictional_story ~ Gender * Age, data = data1, Hess = TRUE)
 
     tidy(Fiction_int) %>%
       kable()

@@ -112,6 +112,24 @@ final_qualtrics <- data_qualtrics %>%
   left_join(data_wide, by = "ID")
 ```
 
+We also need to check that the matching columns in the two dataframes are of the same class:
+
+```{r}
+common_cols <- intersect(names(data_paper), names(final_qualtrics))
+
+class_match <- sapply(common_cols, function(col) {
+  class(data_paper[[col]]) == class(final_qualtrics[[col]])
+})
+
+class_match
+
+```
+
+```{r}
+final_qualtrics$Practice <- as.numeric(final_qualtrics$Practice)
+data_paper$Practice <- as.numeric(data_paper$Practice)
+```
+
 Now we can combine the dataframes:
 
 ```{r}
@@ -121,12 +139,11 @@ data <- data%>% dplyr::select(-Movement_H_story, -Movement_B_story, -Piece_story
 
 Note: to keep track of participants between each half of the survey, they were given a random ID in qualtrics, or were manually numbered in the paper data. We're keeping hold of these columns for now so we can match the demographic variables to the right participant when we load the post-concert data. But essentially, participants who were online won't have a participant number, and paper participants won't have an ID.
 
-To view the combined dataset:
-
 ```{r}
-library(DT)
-datatable(data)
-
+data[] <- lapply(data, function(col) {
+  if (is.character(col)) iconv(col, from = "", to = "UTF-8", sub = "byte") else col
+})
+knitr::kable(data)
 ```
 
 SECOND HALF
@@ -198,11 +215,11 @@ data2 <- data2 %>%
 data2 <- data2 %>% dplyr::select(-Participant_number.y, -ID.y, -Participant_number.x, -ID.x)
 ```
 
-To view the dataset for the second half, including the matched demographic data:
-
 ```{r}
-datatable(data2)
-
+data2[] <- lapply(data2, function(col) {
+  if (is.character(col)) iconv(col, from = "", to = "UTF-8", sub = "byte") else col
+})
+knitr::kable(data2)
 ```
 
 (These are the two dataframes that we'll be loading and working with in other sections of this blog.)
