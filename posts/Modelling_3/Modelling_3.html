@@ -279,7 +279,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(predicted_probs, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> predicted, <span class="at">fill =</span> response.level)) <span class="sc">+</span></span>
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_area</span>() <span class="sc">+</span> </span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">Age"</span>, <span class="at">y =</span> <span class="st">"Predicted Probability</span><span class="sc">\n</span><span class="st">"</span>, </span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">Age (years)"</span>, <span class="at">y =</span> <span class="st">"Predicted Probability</span><span class="sc">\n</span><span class="st">"</span>, </span>
 <span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">title =</span> <span class="fu">paste</span>(outcome, <span class="st">"by Age"</span>)) <span class="sc">+</span></span>
 <span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_manual</span>(</span>
 <span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">name =</span> <span class="cn">NULL</span>,</span>
@@ -326,7 +326,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(pred_music, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> predicted, <span class="at">fill =</span> response.level)) <span class="sc">+</span></span>
 <span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>     <span class="fu">geom_area</span>(<span class="at">alpha =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
 <span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>     <span class="fu">facet_wrap</span>(<span class="sc">~</span> group, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>     <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">Practice"</span>, <span class="at">y =</span> <span class="st">"Predicted Probability</span><span class="sc">\n</span><span class="st">"</span>, <span class="at">title =</span> <span class="st">"Music by Practice, Faceted by Classical Music listening"</span>) <span class="sc">+</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>     <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">Practice (years)"</span>, <span class="at">y =</span> <span class="st">"Predicted Probability</span><span class="sc">\n</span><span class="st">"</span>, <span class="at">title =</span> <span class="st">"Music by Practice, Faceted by Classical Music listening"</span>) <span class="sc">+</span></span>
 <span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>     <span class="fu">scale_fill_manual</span>(<span class="at">name =</span> <span class="cn">NULL</span>, <span class="at">values =</span> fill_colors) <span class="sc">+</span></span>
 <span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>     <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
 <span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>     <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -346,7 +346,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(pred_life, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> predicted, <span class="at">fill =</span> response.level)) <span class="sc">+</span></span>
 <span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>     <span class="fu">geom_area</span>(<span class="at">alpha =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>     <span class="fu">facet_wrap</span>(<span class="sc">~</span> group, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span>  <span class="co"># Facet by Practice</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>     <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">Age"</span>, <span class="at">y =</span> <span class="st">"Predicted Probability</span><span class="sc">\n</span><span class="st">"</span>, <span class="at">title =</span> <span class="st">"Life Experiences by Age, Faceted by Gender"</span>) <span class="sc">+</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>     <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">Age (years)"</span>, <span class="at">y =</span> <span class="st">"Predicted Probability</span><span class="sc">\n</span><span class="st">"</span>, <span class="at">title =</span> <span class="st">"Life Experiences by Age, Faceted by Gender"</span>) <span class="sc">+</span></span>
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>     <span class="fu">scale_fill_manual</span>(<span class="at">name =</span> <span class="cn">NULL</span>, <span class="at">values =</span> fill_colors) <span class="sc">+</span></span>
 <span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>     <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
 <span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>     <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -367,7 +367,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(pred_building, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> predicted, <span class="at">fill =</span> response.level)) <span class="sc">+</span></span>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>     <span class="fu">geom_area</span>(<span class="at">alpha =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
 <span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>     <span class="fu">facet_wrap</span>(<span class="sc">~</span> group, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>     <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">Age"</span>, <span class="at">y =</span> <span class="st">"Predicted Probability</span><span class="sc">\n</span><span class="st">"</span>, <span class="at">title =</span> <span class="st">"Building by Age, Faceted by Floor"</span>) <span class="sc">+</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>     <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">Age (years)"</span>, <span class="at">y =</span> <span class="st">"Predicted Probability</span><span class="sc">\n</span><span class="st">"</span>, <span class="at">title =</span> <span class="st">"Building by Age, Faceted by Floor"</span>) <span class="sc">+</span></span>
 <span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>     <span class="fu">scale_fill_manual</span>(<span class="at">name =</span> <span class="cn">NULL</span>, <span class="at">values =</span> fill_colors) <span class="sc">+</span></span>
 <span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>     <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
 <span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>     <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -377,6 +377,206 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="Modelling_3_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="768"></p>
 </figure>
 </div>
+</div>
+</div>
+<p>Let’s do a little brant test:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MASS)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(brant)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>models <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">fiction =</span> <span class="fu">polr</span>(Fictional_story <span class="sc">~</span> Age, <span class="at">data =</span> completed_data1, <span class="at">method =</span> <span class="st">"logistic"</span>, <span class="at">Hess =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">abstract =</span> <span class="fu">polr</span>(Abstract_shapes <span class="sc">~</span> Age, <span class="at">data =</span> completed_data1, <span class="at">method =</span> <span class="st">"logistic"</span>, <span class="at">Hess =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="at">sense =</span> <span class="fu">polr</span>(<span class="at">formula =</span> Sensory_sensations <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> completed_data1, <span class="at">control =</span> <span class="fu">list</span>(<span class="at">maxit =</span> <span class="dv">1000</span>), <span class="at">na.action =</span> na.exclude, <span class="at">Hess =</span> <span class="cn">TRUE</span>, <span class="at">method =</span> <span class="st">"probit"</span>),</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="at">life =</span> <span class="fu">polr</span>(<span class="at">formula =</span> Life_experiences <span class="sc">~</span> Age <span class="sc">+</span> Gender, <span class="at">data =</span> completed_data1, <span class="at">control =</span> <span class="fu">list</span>(<span class="at">maxit =</span> <span class="dv">1000</span>), <span class="at">na.action =</span> na.exclude, <span class="at">Hess =</span> <span class="cn">TRUE</span>, <span class="at">method =</span> <span class="st">"probit"</span>),</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="at">media =</span> <span class="fu">polr</span>(<span class="at">formula =</span> Media <span class="sc">~</span> Age, <span class="at">data =</span> completed_data1, <span class="at">control =</span> <span class="fu">list</span>(<span class="at">maxit =</span> <span class="dv">1000</span>), <span class="at">na.action =</span> na.exclude, <span class="at">Hess =</span> <span class="cn">TRUE</span>, <span class="at">method =</span> <span class="st">"probit"</span>),</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="at">music =</span> <span class="fu">polr</span>(<span class="at">formula =</span> Music <span class="sc">~</span> Music_listening <span class="sc">+</span> Practice, <span class="at">data =</span> completed_data1, <span class="at">control =</span> <span class="fu">list</span>(<span class="at">maxit =</span> <span class="dv">1000</span>), <span class="at">na.action =</span> na.exclude, <span class="at">Hess =</span> <span class="cn">TRUE</span>, <span class="at">method =</span> <span class="st">"probit"</span>),</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="at">future =</span> <span class="fu">polr</span>(<span class="at">formula =</span> Future_plans <span class="sc">~</span> Age, <span class="at">data =</span> completed_data1, <span class="at">control =</span> <span class="fu">list</span>(<span class="at">maxit =</span> <span class="dv">1000</span>), <span class="at">na.action =</span> na.exclude, <span class="at">Hess =</span> <span class="cn">TRUE</span>, <span class="at">method =</span> <span class="st">"probit"</span>),</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="at">building =</span> <span class="fu">polr</span>(<span class="at">formula =</span> Building <span class="sc">~</span> Age <span class="sc">+</span> Gender <span class="sc">+</span> Music_listening <span class="sc">+</span> Floor, <span class="at">data =</span> completed_data1, <span class="at">control =</span> <span class="fu">list</span>(<span class="at">maxit =</span> <span class="dv">1000</span>), <span class="at">na.action =</span> na.exclude, <span class="at">Hess =</span> <span class="cn">TRUE</span>, <span class="at">method =</span> <span class="st">"probit"</span>),</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="at">everyday =</span> <span class="fu">polr</span>(<span class="at">formula =</span> Everyday <span class="sc">~</span> Age, <span class="at">data =</span> completed_data1, <span class="at">control =</span> <span class="fu">list</span>(<span class="at">maxit =</span> <span class="dv">1000</span>), <span class="at">na.action =</span> na.exclude, <span class="at">Hess =</span> <span class="cn">TRUE</span>, <span class="at">method =</span> <span class="st">"probit"</span>)</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="fu">lapply</span>(models, <span class="cf">function</span>(model) {</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tryCatch</span>({</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">brant.test</span>(model)</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  }, <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">message</span>(<span class="st">"Error in model: "</span>, <span class="fu">conditionMessage</span>(e))</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="cn">NULL</span>)</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$fiction
+
+Brant Test:
+           chi-sq   df   pr(&gt;chi)  
+Omnibus      6.66    3      0.083 .
+Age          6.66    3      0.083 .
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+H0: Proportional odds assumption holds
+
+
+$abstract
+
+Brant Test:
+           chi-sq   df   pr(&gt;chi)
+Omnibus      2.16    3       0.54
+Age          2.16    3       0.54
+
+H0: Proportional odds assumption holds
+
+
+$sense
+NULL
+
+$life
+
+Brant Test:
+                chi-sq   df   pr(&gt;chi)
+Omnibus          5.620    9       0.78
+Age              0.628    3       0.89
+GenderFemale     4.736    3       0.19
+GenderOther      0.000    3       1.00
+
+H0: Proportional odds assumption holds
+
+
+$media
+
+Brant Test:
+           chi-sq   df   pr(&gt;chi)
+Omnibus      3.12    2       0.21
+Age          3.12    2       0.21
+
+H0: Proportional odds assumption holds
+
+
+$music
+
+Brant Test:
+                                        chi-sq   df   pr(&gt;chi)
+Omnibus                                  10.45   15       0.79
+Music_listeningSomewhat rarely            0.00    3       1.00
+Music_listeningModerately frequently      0.00    3       1.00
+Music_listeningFrequently                 0.00    3       1.00
+Music_listeningVery frequently            0.00    3       1.00
+Practice                                  1.49    3       0.69
+
+H0: Proportional odds assumption holds
+
+
+$future
+
+Brant Test:
+           chi-sq   df   pr(&gt;chi)
+Omnibus      0.68    3       0.88
+Age          0.68    3       0.88
+
+H0: Proportional odds assumption holds
+
+
+$building
+
+Brant Test:
+                                        chi-sq   df   pr(&gt;chi)
+Omnibus                                 13.502   24       0.96
+Age                                      4.631    3       0.20
+GenderFemale                             0.957    3       0.81
+GenderOther                              0.000    3       1.00
+Music_listeningSomewhat rarely           0.000    3       1.00
+Music_listeningModerately frequently     0.000    3       1.00
+Music_listeningFrequently                0.000    3       1.00
+Music_listeningVery frequently           0.000    3       1.00
+FloorUpstairs                            2.299    3       0.51
+
+H0: Proportional odds assumption holds
+
+
+$everyday
+
+Brant Test:
+           chi-sq   df   pr(&gt;chi)
+Omnibus      4.66    3        0.2
+Age          4.66    3        0.2
+
+H0: Proportional odds assumption holds</code></pre>
+</div>
+</div>
+<p>And a summary of the latent coefficients with p values:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the necessary library</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tibble)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize an empty list to store the results</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>all_results <span class="ot">&lt;-</span> <span class="fu">tibble</span>()</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Loop through each model in the list</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (model_name <span class="cf">in</span> <span class="fu">names</span>(models)) {</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Processing"</span>, model_name, <span class="st">"model:</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  model <span class="ot">&lt;-</span> models[[model_name]]</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Get the summary</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  model_summary <span class="ot">&lt;-</span> <span class="fu">summary</span>(model)</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Extract coefficients table</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>  coef_table <span class="ot">&lt;-</span> model_summary<span class="sc">$</span>coefficients</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calculate t-values and p-values</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>  t_values <span class="ot">&lt;-</span> coef_table[, <span class="st">"Value"</span>] <span class="sc">/</span> coef_table[, <span class="st">"Std. Error"</span>]</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>  p_values <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="fu">pnorm</span>(<span class="fu">abs</span>(t_values)))</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create a tibble for the current model's results</span></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>  model_results <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">Model =</span> model_name,  <span class="co"># Name of the model</span></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">Term =</span> <span class="fu">rownames</span>(coef_table),  <span class="co"># Term names (e.g., intercept, Age)</span></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">Estimate =</span> coef_table[, <span class="st">"Value"</span>],</span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Std. Error</span><span class="st">`</span> <span class="ot">=</span> coef_table[, <span class="st">"Std. Error"</span>],</span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">t value</span><span class="st">`</span> <span class="ot">=</span> t_values,</span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">p value</span><span class="st">`</span> <span class="ot">=</span> p_values</span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Bind the current model's results to the all_results tibble</span></span>
+<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a>  all_results <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(all_results, model_results)</span>
+<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Processing fiction model:
+
+Processing abstract model:
+
+Processing sense model:
+
+Processing life model:
+
+Processing media model:
+
+Processing music model:
+
+Processing future model:
+
+Processing building model:
+
+Processing everyday model:</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the combined data frame with results for all models</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(all_results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 57 × 6
+   Model    Term                       Estimate `Std. Error` `t value` `p value`
+   &lt;chr&gt;    &lt;chr&gt;                         &lt;dbl&gt;        &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+ 1 fiction  Age                         -0.0181      0.00701     -2.58 0.00978  
+ 2 fiction  Not at all|A small amount…  -1.46        0.434       -3.37 0.000756 
+ 3 fiction  A small amount of the tim…  -0.483       0.418       -1.16 0.248    
+ 4 fiction  A moderate amount of the …   0.462       0.427        1.08 0.279    
+ 5 fiction  Most of the time|All of t…   2.50        0.588        4.25 0.0000211
+ 6 abstract Age                         -0.0131      0.00737     -1.77 0.0766   
+ 7 abstract Not at all|A small amount…  -0.521       0.446       -1.17 0.243    
+ 8 abstract A small amount of the tim…   0.579       0.446        1.30 0.194    
+ 9 abstract A moderate amount of the …   1.94        0.506        3.84 0.000124 
+10 abstract Most of the time|All of t…   4.40        1.08         4.08 0.0000456
+# ℹ 47 more rows</code></pre>
 </div>
 </div>
 

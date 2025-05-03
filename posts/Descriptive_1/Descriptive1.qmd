@@ -160,14 +160,11 @@ colnames(df_mem2) <- c("Movement_eliciting_memory", "Count")
 df_story2 <- as.data.frame(movements_story2)
 colnames(df_story2) <- c("Movement_eliciting_story", "Count")
 
-# Display frequency tables with full movement names
+# Display example frequency table with full movement names
 kable(df_mem1)
-kable(df_story1)
-kable(df_mem2)
-kable(df_story2)
 ```
 
-These can be plotted:
+These counts can be plotted:
 
 ```{r}
 # Add a Composer column (Beethoven for B1-B4, Hough for H1-H6)
@@ -240,20 +237,15 @@ mem_plot2
 story_plot2
 ```
 
-We can also get a summary of the structure of each dataframe.
-
-```{r}
-skim(data)
-skim(data2)
-```
-
 DEMOGRAPHIC INFO
 
-We'll get a quick overview of our demographic data. Note, first we're going to add a 'Floor' column based on participants' location in the hall. Having this info is useful, as concert subscribers sit downstairs in our auditorium.
+We'll get a quick overview of our demographic data. Note, first we're going to add a 'Floor' column based on participants' location in the hall. Having this info is useful, as concert subscribers and many older patrons sit downstairs in the auditorium.
 
 Here's a map of each location in the hall for reference:
 
 <img src="Richardson_map.png" width="300" style="display: block; margin: auto;"/>
+
+Creating the floor variable:
 
 ```{r}
 data <- data %>%

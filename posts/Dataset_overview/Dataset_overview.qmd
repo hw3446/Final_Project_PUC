@@ -130,7 +130,7 @@ final_qualtrics$Practice <- as.numeric(final_qualtrics$Practice)
 data_paper$Practice <- as.numeric(data_paper$Practice)
 ```
 
-Now we can combine the dataframes:
+Now we can combine the dataframes.
 
 ```{r}
 data <- bind_rows(data_paper, final_qualtrics)
@@ -143,7 +143,9 @@ Note: to keep track of participants between each half of the survey, they were g
 data[] <- lapply(data, function(col) {
   if (is.character(col)) iconv(col, from = "", to = "UTF-8", sub = "byte") else col
 })
-knitr::kable(data)
+
+library(DT)
+datatable(data)
 ```
 
 SECOND HALF
@@ -219,7 +221,7 @@ data2 <- data2 %>% dplyr::select(-Participant_number.y, -ID.y, -Participant_numb
 data2[] <- lapply(data2, function(col) {
   if (is.character(col)) iconv(col, from = "", to = "UTF-8", sub = "byte") else col
 })
-knitr::kable(data2)
+datatable(data2)
 ```
 
 (These are the two dataframes that we'll be loading and working with in other sections of this blog.)

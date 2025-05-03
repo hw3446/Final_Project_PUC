@@ -234,7 +234,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>data1<span class="sc">$</span>Floor <span class="ot">&lt;-</span> <span class="fu">factor</span>(data1<span class="sc">$</span>Floor, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">'Downstairs'</span>, <span class="st">'Upstairs'</span>))</span>
 <span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>data2<span class="sc">$</span>Floor <span class="ot">&lt;-</span> <span class="fu">factor</span>(data2<span class="sc">$</span>Floor, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">'Downstairs'</span>, <span class="st">'Upstairs'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Let’s start with a simple model that considers the relationship between a demographic and the likelihood of imagining a fictional story based on a particular demographic variable. We’ll just use the data from the first half of the concert.</p>
+<p>Let’s start with a simple model that considers the likelihood of imagining a fictional story based on a particular demographic variable. We’ll just use the data from the first half of the concert.</p>
 <p>Here’s a plot showing the percentage of participants in each ordinal level for fictional story, by gender and age. We’re ignoring N/As for now:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>data1 <span class="ot">&lt;-</span> data1 <span class="sc">%&gt;%</span></span>
@@ -305,9 +305,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>To create an ordinal regression model, we use the clm() function. Here’s a simple example showing the relationship between age and likelihood of imagining a fictional story based on data from the first half of the concert.</p>
+<p>To create an ordinal regression model, we can use the polr() function. An alternative is clm(), but we won’t be using that here for reasons that will become clear in the next post. Here’s a simple example showing the relationship between age and likelihood of imagining a fictional story based on data from the first half of the concert.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>model_fiction_age <span class="ot">&lt;-</span> <span class="fu">clm</span>(Fictional_story <span class="sc">~</span> Age, <span class="at">data =</span> data1, <span class="at">Hess =</span> <span class="cn">TRUE</span>)</span>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>model_fiction_age <span class="ot">&lt;-</span> <span class="fu">polr</span>(Fictional_story <span class="sc">~</span> Age, <span class="at">data =</span> data1, <span class="at">Hess =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>model_fiction_age <span class="sc">%&gt;%</span> </span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">%&gt;%</span></span>
@@ -315,12 +315,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <colgroup>
-<col style="width: 54%">
+<col style="width: 59%">
+<col style="width: 10%">
 <col style="width: 9%">
-<col style="width: 8%">
 <col style="width: 9%">
-<col style="width: 8%">
-<col style="width: 8%">
+<col style="width: 11%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -328,56 +327,49 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <th style="text-align: right;">estimate</th>
 <th style="text-align: right;">std.error</th>
 <th style="text-align: right;">statistic</th>
-<th style="text-align: right;">p.value</th>
 <th style="text-align: left;">coef.type</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Not at all|A small amount of the time</td>
-<td style="text-align: right;">-1.2000202</td>
-<td style="text-align: right;">0.5581174</td>
-<td style="text-align: right;">-2.1501215</td>
-<td style="text-align: right;">0.0315456</td>
-<td style="text-align: left;">intercept</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">A small amount of the time|A moderate amount of the time</td>
-<td style="text-align: right;">-0.0056613</td>
-<td style="text-align: right;">0.5409042</td>
-<td style="text-align: right;">-0.0104663</td>
-<td style="text-align: right;">0.9916492</td>
-<td style="text-align: left;">intercept</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">A moderate amount of the time|Most of the time</td>
-<td style="text-align: right;">1.0067653</td>
-<td style="text-align: right;">0.5656944</td>
-<td style="text-align: right;">1.7796981</td>
-<td style="text-align: right;">0.0751254</td>
-<td style="text-align: left;">intercept</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Most of the time|All of the time</td>
-<td style="text-align: right;">2.4637137</td>
-<td style="text-align: right;">0.7068055</td>
-<td style="text-align: right;">3.4857024</td>
-<td style="text-align: right;">0.0004908</td>
-<td style="text-align: left;">intercept</td>
-</tr>
-<tr class="odd">
 <td style="text-align: left;">Age</td>
-<td style="text-align: right;">-0.0118818</td>
-<td style="text-align: right;">0.0095693</td>
-<td style="text-align: right;">-1.2416588</td>
-<td style="text-align: right;">0.2143625</td>
-<td style="text-align: left;">location</td>
+<td style="text-align: right;">-0.0177859</td>
+<td style="text-align: right;">0.0076904</td>
+<td style="text-align: right;">-2.312746</td>
+<td style="text-align: left;">coefficient</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Not at all|A small amount of the time</td>
+<td style="text-align: right;">-1.4224110</td>
+<td style="text-align: right;">0.4825786</td>
+<td style="text-align: right;">-2.947522</td>
+<td style="text-align: left;">scale</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">A small amount of the time|A moderate amount of the time</td>
+<td style="text-align: right;">-0.4669298</td>
+<td style="text-align: right;">0.4678960</td>
+<td style="text-align: right;">-0.997935</td>
+<td style="text-align: left;">scale</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">A moderate amount of the time|Most of the time</td>
+<td style="text-align: right;">0.4674059</td>
+<td style="text-align: right;">0.4778772</td>
+<td style="text-align: right;">0.978088</td>
+<td style="text-align: left;">scale</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Most of the time|All of the time</td>
+<td style="text-align: right;">2.3692958</td>
+<td style="text-align: right;">0.6214800</td>
+<td style="text-align: right;">3.812345</td>
+<td style="text-align: left;">scale</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-<p>Based on the model outcome for the ‘Age’ term (estimate = -0.0119), we can see that as age increases, respondents are less likely to choose higher categories (e.g.&nbsp;less likely to report experiencing a fictional story frequently). However, p = 0.214, so this is not statistically significant.</p>
 <p><code>ggemmeans</code> can be used to visualise the model.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>predictions <span class="ot">&lt;-</span> <span class="fu">ggemmeans</span>(model_fiction_age, <span class="at">terms =</span> <span class="st">"Age"</span>)</span>
@@ -412,8 +404,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>
 Brant Test:
            chi-sq   df   pr(&gt;chi)
-Omnibus      2.64    3       0.45
-Age          2.64    3       0.45
+Omnibus      4.47    3       0.22
+Age          4.47    3       0.22
 
 H0: Proportional odds assumption holds</code></pre>
 </div>
@@ -422,19 +414,18 @@ H0: Proportional odds assumption holds</code></pre>
 <p>MODEL COMPARISONS</p>
 <p>Let’s do some comparing comparison now. Here we’re going to integrate age and gender into the same model.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>Fiction_int <span class="ot">=</span> <span class="fu">clm</span>(Fictional_story <span class="sc">~</span> Gender<span class="sc">*</span>Age, <span class="at">data=</span>data1)</span>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>Fiction_int <span class="ot">&lt;-</span> <span class="fu">polr</span>(Fictional_story <span class="sc">~</span> Gender <span class="sc">*</span> Age, <span class="at">data =</span> data1, <span class="at">Hess =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tidy</span>(Fiction_int) <span class="sc">%&gt;%</span></span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>      <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <colgroup>
-<col style="width: 54%">
+<col style="width: 58%">
+<col style="width: 10%">
 <col style="width: 9%">
-<col style="width: 8%">
-<col style="width: 9%">
-<col style="width: 8%">
-<col style="width: 8%">
+<col style="width: 10%">
+<col style="width: 11%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -442,66 +433,58 @@ H0: Proportional odds assumption holds</code></pre>
 <th style="text-align: right;">estimate</th>
 <th style="text-align: right;">std.error</th>
 <th style="text-align: right;">statistic</th>
-<th style="text-align: right;">p.value</th>
 <th style="text-align: left;">coef.type</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Not at all|A small amount of the time</td>
-<td style="text-align: right;">-0.9149422</td>
-<td style="text-align: right;">0.8400896</td>
-<td style="text-align: right;">-1.0891007</td>
-<td style="text-align: right;">0.2761095</td>
-<td style="text-align: left;">intercept</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">A small amount of the time|A moderate amount of the time</td>
-<td style="text-align: right;">0.3051990</td>
-<td style="text-align: right;">0.8402217</td>
-<td style="text-align: right;">0.3632362</td>
-<td style="text-align: right;">0.7164284</td>
-<td style="text-align: left;">intercept</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">A moderate amount of the time|Most of the time</td>
-<td style="text-align: right;">1.3205635</td>
-<td style="text-align: right;">0.8608620</td>
-<td style="text-align: right;">1.5340014</td>
-<td style="text-align: right;">0.1250293</td>
-<td style="text-align: left;">intercept</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Most of the time|All of the time</td>
-<td style="text-align: right;">2.7692707</td>
-<td style="text-align: right;">0.9543832</td>
-<td style="text-align: right;">2.9016340</td>
-<td style="text-align: right;">0.0037122</td>
-<td style="text-align: left;">intercept</td>
-</tr>
-<tr class="odd">
 <td style="text-align: left;">GenderFemale</td>
-<td style="text-align: right;">0.5410978</td>
-<td style="text-align: right;">1.0907027</td>
-<td style="text-align: right;">0.4961002</td>
-<td style="text-align: right;">0.6198237</td>
-<td style="text-align: left;">location</td>
+<td style="text-align: right;">0.1679645</td>
+<td style="text-align: right;">0.9490486</td>
+<td style="text-align: right;">0.1769820</td>
+<td style="text-align: left;">coefficient</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Age</td>
-<td style="text-align: right;">-0.0033337</td>
-<td style="text-align: right;">0.0145300</td>
-<td style="text-align: right;">-0.2294329</td>
-<td style="text-align: right;">0.8185324</td>
-<td style="text-align: left;">location</td>
+<td style="text-align: right;">-0.0144089</td>
+<td style="text-align: right;">0.0119819</td>
+<td style="text-align: right;">-1.2025550</td>
+<td style="text-align: left;">coefficient</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">GenderFemale:Age</td>
-<td style="text-align: right;">-0.0161627</td>
-<td style="text-align: right;">0.0194180</td>
-<td style="text-align: right;">-0.8323554</td>
-<td style="text-align: right;">0.4052083</td>
-<td style="text-align: left;">location</td>
+<td style="text-align: right;">-0.0060620</td>
+<td style="text-align: right;">0.0155623</td>
+<td style="text-align: right;">-0.3895341</td>
+<td style="text-align: left;">coefficient</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Not at all|A small amount of the time</td>
+<td style="text-align: right;">-1.3302443</td>
+<td style="text-align: right;">0.7463162</td>
+<td style="text-align: right;">-1.7824138</td>
+<td style="text-align: left;">scale</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">A small amount of the time|A moderate amount of the time</td>
+<td style="text-align: right;">-0.3709033</td>
+<td style="text-align: right;">0.7399300</td>
+<td style="text-align: right;">-0.5012682</td>
+<td style="text-align: left;">scale</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">A moderate amount of the time|Most of the time</td>
+<td style="text-align: right;">0.5625857</td>
+<td style="text-align: right;">0.7493298</td>
+<td style="text-align: right;">0.7507852</td>
+<td style="text-align: left;">scale</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Most of the time|All of the time</td>
+<td style="text-align: right;">2.4629239</td>
+<td style="text-align: right;">0.8454431</td>
+<td style="text-align: right;">2.9131751</td>
+<td style="text-align: left;">scale</td>
 </tr>
 </tbody>
 </table>
@@ -530,8 +513,8 @@ H0: Proportional odds assumption holds</code></pre>
 <tr class="odd">
 <td style="text-align: left;">model_no_int</td>
 <td style="text-align: right;">5</td>
-<td style="text-align: right;">269.0693</td>
-<td style="text-align: right;">-129.5346</td>
+<td style="text-align: right;">428.1667</td>
+<td style="text-align: right;">-209.0834</td>
 <td style="text-align: right;">NA</td>
 <td style="text-align: right;">NA</td>
 <td style="text-align: right;">NA</td>
@@ -539,11 +522,11 @@ H0: Proportional odds assumption holds</code></pre>
 <tr class="even">
 <td style="text-align: left;">model_int</td>
 <td style="text-align: right;">7</td>
-<td style="text-align: right;">271.7126</td>
-<td style="text-align: right;">-128.8563</td>
-<td style="text-align: right;">1.356628</td>
+<td style="text-align: right;">431.6481</td>
+<td style="text-align: right;">-208.8240</td>
+<td style="text-align: right;">0.5186507</td>
 <td style="text-align: right;">2</td>
-<td style="text-align: right;">0.507472</td>
+<td style="text-align: right;">0.771572</td>
 </tr>
 </tbody>
 </table>

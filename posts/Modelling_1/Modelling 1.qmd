@@ -67,7 +67,7 @@ data1$Floor <- factor(data1$Floor, levels = c('Downstairs', 'Upstairs'))
 data2$Floor <- factor(data2$Floor, levels = c('Downstairs', 'Upstairs'))
 ```
 
-Let's start with a simple model that considers the relationship between a demographic and the likelihood of imagining a fictional story based on a particular demographic variable. We'll just use the data from the first half of the concert.
+Let's start with a simple model that considers the likelihood of imagining a fictional story based on a particular demographic variable. We'll just use the data from the first half of the concert.
 
 Here's a plot showing the percentage of participants in each ordinal level for fictional story, by gender and age. We're ignoring N/As for now:
 

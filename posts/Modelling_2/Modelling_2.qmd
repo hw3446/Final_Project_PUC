@@ -1,9 +1,10 @@
 ---
-title: "Ordinal regression: model Selection"
+title: "Ordinal regression: model selection"
 format: html
 author: "Hannah Wilkie"
 execute:
   warning: false
+image: "Audience.jpg"
 ---
 
 ```{r}
@@ -12,6 +13,7 @@ library(MASS)
 library(dplyr)
 library(corrplot)
 library(car)
+library(knitr)
 ```
 
 In this section, we'll experiment with the step() function in R to help select ordinal regression models for our data.
@@ -67,10 +69,11 @@ data2$Music_listening <- factor(data2$Music_listening, levels = c('Very rarely',
 data1$Floor <- factor(data1$Floor, levels = c('Downstairs', 'Upstairs'))
 data2$Floor <- factor(data2$Floor, levels = c('Downstairs', 'Upstairs'))
 ```
+
 We have some NAs in our dataframe, so before running the models, we need to figure out what to do with these.
 
-
 Let's get a map of our missing data:
+
 ```{r}
 
 library(Amelia)
@@ -92,20 +95,17 @@ mcar_test(dem_out)
 
 p \> 0.05, so there is insufficient evidence to reject the null hypothesis that the data is MCAR.
 
-Based on this, we can use imputation to deal with the NAs.
+Based on this, we can use multiple imputation to deal with the NAs. This has the advantage of preserving the data structure and reflecting uncertainty without data loss.
 
 ```{r}
 library(mice)
 imputed_data1 <- mice(data1, m = 5, method = 'pmm', seed = 123, print = FALSE)
 completed_data1 <- complete(imputed_data1, 1)
-
 ```
-
-
 
 Let's now run the step() function with our imputed data for fictional story.
 
-1. Start by specifying the model with with maximum number of demographic inputs. 
+1.  Start by specifying the model with with maximum number of demographic inputs.
 
 ```{r}
 model_fiction_imp <- polr(Fictional_story ~ Age + Gender + Music_listening + Practice + Floor, 
@@ -116,8 +116,7 @@ stepwise_model_imp <- step(model_fiction_imp)
 summary(stepwise_model_imp)
 ```
 
-step() ran through all the possible demographics to find the model with the lowest AIC. In this case the most successful model was one with just age as a demographic input.
-
+Here step() ran through all the possible demographics to find the model with the lowest AIC. In this case the most successful model was one with just age as a demographic input.
 
 We can run the step() function looping through all the possible outcome variables using the imputed data.
 
@@ -159,48 +158,23 @@ for (outcome in outcome_vars) {
 
 From the above, we can see that the models with the lowest AIC (using just main effects) are as follows:
 
-Fictional story:
-polr(formula = Fictional_story ~ Age, data = completed_data1, 
-    control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, 
-    method = "probit")
-    
-Abstract shapes:
-polr(formula = Abstract_shapes ~ Age, data = completed_data1, 
-    control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, 
-    method = "probit")
-    
-Sensory sensations:
-polr(formula = Sensory_sensations ~ 1, data = completed_data1, 
-    control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, 
-    method = "probit")
-    
-Life experiences:
-polr(formula = Life_experiences ~ Age + Gender, data = completed_data1, 
-    control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, 
-    method = "probit")
-    
-Media:
-polr(formula = Media ~ Age, data = completed_data1, control = list(maxit = 1000), 
-    na.action = na.exclude, Hess = TRUE, method = "probit")
-    
-Music:
-polr(formula = Music ~ Music_listening + Practice, data = completed_data1, 
-    control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, 
-    method = "probit")
-    
-Future plans:
-polr(formula = Future_plans ~ Age, data = completed_data1, control = list(maxit = 1000), 
-    na.action = na.exclude, Hess = TRUE, method = "probit")
+Fictional story: polr(formula = Fictional_story \~ Age, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "probit")
 
-Building:
-polr(formula = Building ~ Age + Gender + Music_listening + Floor, 
-    data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, 
-    Hess = TRUE, method = "probit")
+Abstract shapes: polr(formula = Abstract_shapes \~ Age, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "probit")
 
-Everyday:
-polr(formula = Everyday ~ Age, data = completed_data1, control = list(maxit = 1000), 
-    na.action = na.exclude, Hess = TRUE, method = "probit")
+Sensory sensations: polr(formula = Sensory_sensations \~ 1, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "probit")
 
+Life experiences: polr(formula = Life_experiences \~ Age + Gender, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "probit")
+
+Media: polr(formula = Media \~ Age, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "probit")
+
+Music: polr(formula = Music \~ Music_listening + Practice, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "probit")
+
+Future plans: polr(formula = Future_plans \~ Age, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "probit")
+
+Building: polr(formula = Building \~ Age + Gender + Music_listening + Floor, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "probit")
+
+Everyday: polr(formula = Everyday \~ Age, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "probit")
 
 Let's also look at the interactions between the demographic variables and check for multicollinearity.
 
@@ -222,7 +196,6 @@ demographics_numeric <- demographics_data %>%
 # Compute correlation matrix
 cor_matrix <- cor(demographics_numeric, use = "pairwise.complete.obs")
 
-# Plot heatmap
 corrplot(cor_matrix, method = "color", type = "lower", 
          tl.col = "black", tl.srt = 45, addCoef.col = "white", 
          col = colorRampPalette(c("blue", "white", "red"))(200))
@@ -244,44 +217,3 @@ vif(model5)
 All vif() outputs are close to 1, indicating that multicollinearity shouldn't be a problem.
 
 In the post on 'Ordinal regression: final models', we'll use these step() results to run some final model visualisations.
-
-
-```{r}
-# To store tidy results
-tidy_results <- list()
-
-for (outcome in outcome_vars) {
-  formula <- as.formula(paste(outcome, "~ Age + Gender + Music_listening + Practice + Floor"))
-
-  tryCatch({
-    model <- polr(formula, data = completed_data1, Hess = TRUE, method = "probit",
-                  control = list(maxit = 1000), na.action = na.exclude)
-    
-    models[[outcome]] <- model
-    
-    # Stepwise model
-    step_model <- step(model, direction = "backward", trace = FALSE)
-    stepwise_models[[outcome]] <- step_model
-
-    # Tidy model output
-    tidy_df <- tidy(step_model, conf.int = TRUE)
-    tidy_df$outcome <- outcome  # Add outcome column
-    tidy_results[[outcome]] <- tidy_df
-
-  }, error = function(e) {
-    cat("\nSkipping", outcome, "due to error:", conditionMessage(e), "\n")
-  })
-}
-```
-
-```{r}
-final_results <- bind_rows(tidy_results)
-
-# Add p-values if needed
-final_results <- final_results %>%
-  mutate(p.value = 2 * (1 - pnorm(abs(statistic))))
-
-# View table
-kable(final_results, digits = 3)
-```
-
