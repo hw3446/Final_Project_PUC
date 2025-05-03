@@ -216,3 +216,85 @@ vif(model5)
 All vif() outputs are close to 1, indicating that multicollinearity shouldn't be a problem.
 
 In the post on 'Ordinal regression: final models', we'll use these step() results to run some final model visualisations.
+
+Rerunning the above steps for the second dataset:
+
+```{r}
+imputed_data2 <- mice(data2, m = 5, method = 'pmm', seed = 123, print = FALSE)
+completed_data2 <- complete(imputed_data2, 1)
+```
+
+```{r}
+# List to store results
+models <- list()
+stepwise_models <- list()
+
+# Loop through selected outcomes
+for (outcome in outcome_vars) {
+  formula <- as.formula(paste(outcome, "~ Age + Gender + Music_listening + Practice + Floor"))
+
+  tryCatch({
+    # Fit proportional odds model
+    model <- polr(formula, data = completed_data2, Hess = TRUE, method = "logistic", 
+                  control = list(maxit = 1000), na.action = na.exclude)
+    
+    # Store model
+    models[[outcome]] <- model
+    
+    # Print summary
+    cat("\nSummary for", outcome, ":\n")
+    print(summary(model))
+    
+    # Perform stepwise regression
+    step_model <- step(model, direction = "backward", trace = FALSE)
+    stepwise_models[[outcome]] <- step_model
+    
+    # Print stepwise summary
+    cat("\nStepwise Model Summary for", outcome, ":\n")
+    print(summary(step_model))
+    
+  }, error = function(e) {
+    cat("\nSkipping", outcome, "due to error:", conditionMessage(e), "\n")
+  })
+}
+
+```
+
+The models for the second half of the data are:
+
+```         
+polr(formula = Fictional_story ~ Age, data = completed_data2,      control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE,      method = "logistic")
+```
+
+```         
+polr(formula = Abstract_shapes ~ 1, data = completed_data2, control = list(maxit = 1000), 
+    na.action = na.exclude, Hess = TRUE, method = "logistic")
+```
+
+```         
+polr(formula = Sensory_sensations ~ 1, data = completed_data2,      control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE,      method = "logistic")
+```
+
+```         
+polr(formula = Life_experiences ~ Age, data = completed_data2,      control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE,      method = "logistic")
+```
+
+```         
+polr(formula = Media ~ Age, data = completed_data2, control = list(maxit = 1000),      na.action = na.exclude, Hess = TRUE, method = "logistic") 
+```
+
+```         
+polr(formula = Music ~ Age + Gender + Practice, data = completed_data2,      control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE,      method = "logistic")
+```
+
+```         
+polr(formula = Future_plans ~ Age, data = completed_data2, control = list(maxit = 1000),      na.action = na.exclude, Hess = TRUE, method = "logistic")
+```
+
+```         
+polr(formula = Building ~ Floor, data = completed_data2, control = list(maxit = 1000),      na.action = na.exclude, Hess = TRUE, method = "logistic")
+```
+
+```         
+polr(formula = Everyday ~ Age, data = completed_data2, control = list(maxit = 1000),      na.action = na.exclude, Hess = TRUE, method = "logistic") 
+```
