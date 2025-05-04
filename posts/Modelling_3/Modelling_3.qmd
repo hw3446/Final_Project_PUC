@@ -238,44 +238,38 @@ lapply(models, function(model) {
 And a summary of the latent coefficients with p values:
 
 ```{r}
-# Load the necessary library
 library(tibble)
 library(dplyr)
 
-# Initialize an empty list to store the results
 all_results <- tibble()
 
-# Loop through each model in the list
 for (model_name in names(models)) {
-  cat("\nProcessing", model_name, "model:\n")
   model <- models[[model_name]]
   
-  # Get the summary
   model_summary <- summary(model)
   
-  # Extract coefficients table
   coef_table <- model_summary$coefficients
   
   # Calculate t-values and p-values
   t_values <- coef_table[, "Value"] / coef_table[, "Std. Error"]
   p_values <- 2 * (1 - pnorm(abs(t_values)))
   
-  # Create a tibble for the current model's results
   model_results <- tibble(
-    Model = model_name,  # Name of the model
-    Term = rownames(coef_table),  # Term names (e.g., intercept, Age)
+    Model = model_name, 
+    Term = rownames(coef_table),
     Estimate = coef_table[, "Value"],
     `Std. Error` = coef_table[, "Std. Error"],
     `t value` = t_values,
     `p value` = p_values
   )
   
-  # Bind the current model's results to the all_results tibble
+ 
   all_results <- bind_rows(all_results, model_results)
 }
 
 # Print the combined data frame with results for all models
-print(all_results)
+library(DT)
+datatable(all_results)
 ```
 
 SECOND HALF
@@ -307,10 +301,14 @@ Models that don't match the first half:
 -   polr(formula = Building \~ Floor, data = completed_data2, control = list(maxit = 1000), Hess = TRUE, method = "logistic")
 
 ```{r}
+library(mice)
+library(MASS)
 
+#Impute data for second half
 imputed_data2 <- mice(data2, m = 5, method = 'pmm', seed = 123, print = FALSE)
 completed_data2 <- complete(imputed_data2, 1)
 
+#List models
 models2 <- list(
   fiction = polr(Fictional_story ~ Age, data = completed_data2, method = "logistic", Hess = TRUE),
   abstract = polr(Abstract_shapes ~ 1, data = completed_data2, method = "logistic", Hess = TRUE),
@@ -322,42 +320,32 @@ future = polr(formula = Future_plans ~ Age, data = completed_data2, control = li
 building = polr(formula = Building ~ Floor, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "probit"),
 everyday = polr(formula = Everyday ~ Age, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "probit")
 )
-# Load the necessary library
-library(tibble)
-library(dplyr)
 
-# Initialize an empty list to store the results
+# Loop through each model
 all_results <- tibble()
 
-# Loop through each model in the list
 for (model_name in names(models2)) {
-  cat("\nProcessing", model_name, "model:\n")
   model <- models2[[model_name]]
   
-  # Get the summary
   model_summary <- summary(model)
   
-  # Extract coefficients table
   coef_table <- model_summary$coefficients
   
-  # Calculate t-values and p-values
   t_values <- coef_table[, "Value"] / coef_table[, "Std. Error"]
   p_values <- 2 * (1 - pnorm(abs(t_values)))
   
-  # Create a tibble for the current model's results
   model_results <- tibble(
-    Model = model_name,  # Name of the model
-    Term = rownames(coef_table),  # Term names (e.g., intercept, Age)
+    Model = model_name,  
+    Term = rownames(coef_table),  
     Estimate = coef_table[, "Value"],
     `Std. Error` = coef_table[, "Std. Error"],
     `t value` = t_values,
     `p value` = p_values
   )
   
-  # Bind the current model's results to the all_results tibble
   all_results <- bind_rows(all_results, model_results)
 }
 
 # Print the combined data frame with results for all models
-print(all_results)
+datatable(all_results)
 ```
