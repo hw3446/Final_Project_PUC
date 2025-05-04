@@ -907,15 +907,17 @@ AIC: 434.6746 </code></pre>
 </div>
 </div>
 <p>From the above, we can see that the models with the lowest AIC (using just main effects) are as follows:</p>
-<p>Fictional story: polr(formula = Fictional_story ~ Age, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “probit”)</p>
-<p>Abstract shapes: polr(formula = Abstract_shapes ~ Age, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “probit”)</p>
-<p>Sensory sensations: polr(formula = Sensory_sensations ~ 1, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “probit”)</p>
-<p>Life experiences: polr(formula = Life_experiences ~ Age + Gender, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “probit”)</p>
-<p>Media: polr(formula = Media ~ Age, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “probit”)</p>
-<p>Music: polr(formula = Music ~ Music_listening + Practice, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “probit”)</p>
-<p>Future plans: polr(formula = Future_plans ~ Age, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “probit”)</p>
-<p>Building: polr(formula = Building ~ Age + Gender + Music_listening + Floor, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “probit”)</p>
-<p>Everyday: polr(formula = Everyday ~ Age, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “probit”)</p>
+<ul>
+<li><p>Fictional story: polr(formula = Fictional_story ~ Age, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “probit”)</p></li>
+<li><p>Abstract shapes: polr(formula = Abstract_shapes ~ Age, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “probit”)</p></li>
+<li><p>Sensory sensations: polr(formula = Sensory_sensations ~ 1, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “probit”)</p></li>
+<li><p>Life experiences: polr(formula = Life_experiences ~ Age + Gender, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “probit”)</p></li>
+<li><p>Media: polr(formula = Media ~ Age, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “probit”)</p></li>
+<li><p>Music: polr(formula = Music ~ Music_listening + Practice, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “probit”)</p></li>
+<li><p>Future plans: polr(formula = Future_plans ~ Age, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “probit”)</p></li>
+<li><p>Building: polr(formula = Building ~ Age + Gender + Music_listening + Floor, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “probit”)</p></li>
+<li><p>Everyday: polr(formula = Everyday ~ Age, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “probit”)</p></li>
+</ul>
 <p>Let’s also look at the interactions between the demographic variables and check for multicollinearity.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(conflicted)</span>
@@ -979,6 +981,585 @@ AIC: 434.6746 </code></pre>
 </div>
 <p>All vif() outputs are close to 1, indicating that multicollinearity shouldn’t be a problem.</p>
 <p>In the post on ‘Ordinal regression: final models’, we’ll use these step() results to run some final model visualisations.</p>
+<p>Rerunning the above steps for the second dataset:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>imputed_data2 <span class="ot">&lt;-</span> <span class="fu">mice</span>(data2, <span class="at">m =</span> <span class="dv">5</span>, <span class="at">method =</span> <span class="st">'pmm'</span>, <span class="at">seed =</span> <span class="dv">123</span>, <span class="at">print =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>completed_data2 <span class="ot">&lt;-</span> <span class="fu">complete</span>(imputed_data2, <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># List to store results</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>models <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>stepwise_models <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Loop through selected outcomes</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (outcome <span class="cf">in</span> outcome_vars) {</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">paste</span>(outcome, <span class="st">"~ Age + Gender + Music_listening + Practice + Floor"</span>))</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tryCatch</span>({</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Fit proportional odds model</span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>    model <span class="ot">&lt;-</span> <span class="fu">polr</span>(formula, <span class="at">data =</span> completed_data2, <span class="at">Hess =</span> <span class="cn">TRUE</span>, <span class="at">method =</span> <span class="st">"logistic"</span>, </span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>                  <span class="at">control =</span> <span class="fu">list</span>(<span class="at">maxit =</span> <span class="dv">1000</span>), <span class="at">na.action =</span> na.exclude)</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Store model</span></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>    models[[outcome]] <span class="ot">&lt;-</span> model</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Print summary</span></span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Summary for"</span>, outcome, <span class="st">":</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span>(<span class="fu">summary</span>(model))</span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Perform stepwise regression</span></span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>    step_model <span class="ot">&lt;-</span> <span class="fu">step</span>(model, <span class="at">direction =</span> <span class="st">"backward"</span>, <span class="at">trace =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>    stepwise_models[[outcome]] <span class="ot">&lt;-</span> step_model</span>
+<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Print stepwise summary</span></span>
+<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Stepwise Model Summary for"</span>, outcome, <span class="st">":</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">print</span>(<span class="fu">summary</span>(step_model))</span>
+<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb26-29"><a href="#cb26-29" aria-hidden="true" tabindex="-1"></a>  }, <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
+<span id="cb26-30"><a href="#cb26-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Skipping"</span>, outcome, <span class="st">"due to error:"</span>, <span class="fu">conditionMessage</span>(e), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb26-31"><a href="#cb26-31" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb26-32"><a href="#cb26-32" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Summary for Fictional_story :
+Call:
+polr(formula = formula, data = completed_data2, control = list(maxit = 1000), 
+    na.action = na.exclude, Hess = TRUE, method = "logistic")
+
+Coefficients:
+                                          Value Std. Error  t value
+Age                                  -0.0176243   0.008293 -2.12513
+GenderFemale                         -0.3661109   0.314182 -1.16528
+GenderOther                           0.0710648   1.692232  0.04199
+Music_listeningSomewhat rarely       -1.2636608   1.352075 -0.93461
+Music_listeningModerately frequently -2.2711666   1.236248 -1.83714
+Music_listeningFrequently            -2.1992976   1.205457 -1.82445
+Music_listeningVery frequently       -2.3862820   1.194958 -1.99696
+Practice                             -0.0007123   0.007227 -0.09857
+FloorUpstairs                         0.5244737   0.363286  1.44369
+
+Intercepts:
+                                                         Value   Std. Error
+Not at all|A small amount of the time                    -2.9236  1.2551   
+A small amount of the time|A moderate amount of the time -2.0166  1.2438   
+A moderate amount of the time|Most of the time           -0.9469  1.2332   
+Most of the time|All of the time                          1.4844  1.3677   
+                                                         t value
+Not at all|A small amount of the time                    -2.3293
+A small amount of the time|A moderate amount of the time -1.6214
+A moderate amount of the time|Most of the time           -0.7679
+Most of the time|All of the time                          1.0853
+
+Residual Deviance: 373.6608 
+AIC: 399.6608 
+
+Stepwise Model Summary for Fictional_story :
+Call:
+polr(formula = Fictional_story ~ Age, data = completed_data2, 
+    control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, 
+    method = "logistic")
+
+Coefficients:
+       Value Std. Error t value
+Age -0.02029   0.007802    -2.6
+
+Intercepts:
+                                                         Value   Std. Error
+Not at all|A small amount of the time                    -1.0098  0.4749   
+A small amount of the time|A moderate amount of the time -0.1455  0.4662   
+A moderate amount of the time|Most of the time            0.8795  0.4856   
+Most of the time|All of the time                          3.2507  0.8239   
+                                                         t value
+Not at all|A small amount of the time                    -2.1262
+A small amount of the time|A moderate amount of the time -0.3121
+A moderate amount of the time|Most of the time            1.8112
+Most of the time|All of the time                          3.9453
+
+Residual Deviance: 383.2349 
+AIC: 393.2349 
+
+Summary for Abstract_shapes :
+Call:
+polr(formula = formula, data = completed_data2, control = list(maxit = 1000), 
+    na.action = na.exclude, Hess = TRUE, method = "logistic")
+
+Coefficients:
+                                          Value Std. Error    t value
+Age                                   -0.013355  9.113e-03 -1.466e+00
+GenderFemale                          -0.256250  3.474e-01 -7.377e-01
+GenderOther                          -15.602103  3.315e-07 -4.706e+07
+Music_listeningSomewhat rarely         0.059382  1.493e+00  3.978e-02
+Music_listeningModerately frequently  -0.556828  1.367e+00 -4.073e-01
+Music_listeningFrequently             -0.160354  1.330e+00 -1.206e-01
+Music_listeningVery frequently         0.176847  1.316e+00  1.344e-01
+Practice                              -0.006678  8.183e-03 -8.161e-01
+FloorUpstairs                         -0.535143  3.764e-01 -1.422e+00
+
+Intercepts:
+                                                         Value        
+Not at all|A small amount of the time                    -6.850000e-01
+A small amount of the time|A moderate amount of the time  4.053000e-01
+A moderate amount of the time|Most of the time            1.411900e+00
+Most of the time|All of the time                          3.681900e+00
+                                                         Std. Error   
+Not at all|A small amount of the time                     1.355500e+00
+A small amount of the time|A moderate amount of the time  1.356200e+00
+A moderate amount of the time|Most of the time            1.380000e+00
+Most of the time|All of the time                          1.669700e+00
+                                                         t value      
+Not at all|A small amount of the time                    -5.053000e-01
+A small amount of the time|A moderate amount of the time  2.988000e-01
+A moderate amount of the time|Most of the time            1.023100e+00
+Most of the time|All of the time                          2.205100e+00
+
+Residual Deviance: 294.3223 
+AIC: 320.3223 
+
+Stepwise Model Summary for Abstract_shapes :
+Call:
+polr(formula = Abstract_shapes ~ 1, data = completed_data2, control = list(maxit = 1000), 
+    na.action = na.exclude, Hess = TRUE, method = "logistic")
+
+No coefficients
+
+Intercepts:
+                                                         Value  Std. Error
+Not at all|A small amount of the time                    0.7793 0.1708    
+A small amount of the time|A moderate amount of the time 1.8289 0.2297    
+A moderate amount of the time|Most of the time           2.8134 0.3432    
+Most of the time|All of the time                         5.0626 1.0032    
+                                                         t value
+Not at all|A small amount of the time                    4.5627 
+A small amount of the time|A moderate amount of the time 7.9629 
+A moderate amount of the time|Most of the time           8.1979 
+Most of the time|All of the time                         5.0467 
+
+Residual Deviance: 302.6345 
+AIC: 310.6345 
+
+Summary for Sensory_sensations :
+Call:
+polr(formula = formula, data = completed_data2, control = list(maxit = 1000), 
+    na.action = na.exclude, Hess = TRUE, method = "logistic")
+
+Coefficients:
+                                         Value Std. Error    t value
+Age                                  -0.014536  9.370e-03 -1.551e+00
+GenderFemale                         -0.147536  3.628e-01 -4.067e-01
+GenderOther                          -9.402456  3.556e-05 -2.644e+05
+Music_listeningSomewhat rarely       12.479157  5.942e-01  2.100e+01
+Music_listeningModerately frequently 12.685798  3.600e-01  3.524e+01
+Music_listeningFrequently            12.152633  3.471e-01  3.501e+01
+Music_listeningVery frequently       12.266885  3.126e-01  3.925e+01
+Practice                             -0.005029  8.280e-03 -6.074e-01
+FloorUpstairs                         0.074309  4.013e-01  1.852e-01
+
+Intercepts:
+                                                         Value       
+Not at all|A small amount of the time                         12.3461
+A small amount of the time|A moderate amount of the time      13.8985
+A moderate amount of the time|Most of the time                14.8317
+Most of the time|All of the time                            5159.6273
+                                                         Std. Error  
+Not at all|A small amount of the time                          0.5724
+A small amount of the time|A moderate amount of the time       0.6122
+A moderate amount of the time|Most of the time                 0.6989
+Most of the time|All of the time                               0.6989
+                                                         t value     
+Not at all|A small amount of the time                         21.5695
+A small amount of the time|A moderate amount of the time      22.7023
+A moderate amount of the time|Most of the time                21.2228
+Most of the time|All of the time                            7382.9711
+
+Residual Deviance: 246.2747 
+AIC: 272.2747 
+
+Stepwise Model Summary for Sensory_sensations :
+Call:
+polr(formula = Sensory_sensations ~ 1, data = completed_data2, 
+    control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, 
+    method = "logistic")
+
+No coefficients
+
+Intercepts:
+                                                         Value   Std. Error
+Not at all|A small amount of the time                     0.9921  0.1785   
+A small amount of the time|A moderate amount of the time  2.5049  0.3002   
+A moderate amount of the time|Most of the time            3.4256  0.4542   
+Most of the time|All of the time                         12.7680 49.7515   
+                                                         t value
+Not at all|A small amount of the time                     5.5572
+A small amount of the time|A moderate amount of the time  8.3446
+A moderate amount of the time|Most of the time            7.5424
+Most of the time|All of the time                          0.2566
+
+Residual Deviance: 252.8352 
+AIC: 260.8352 
+
+Summary for Life_experiences :
+Call:
+polr(formula = formula, data = completed_data2, control = list(maxit = 1000), 
+    na.action = na.exclude, Hess = TRUE, method = "logistic")
+
+Coefficients:
+                                         Value Std. Error t value
+Age                                  -0.021272   0.007879 -2.6999
+GenderFemale                         -0.298710   0.295125 -1.0121
+GenderOther                           2.931900   1.781000  1.6462
+Music_listeningSomewhat rarely       -0.809748   1.265101 -0.6401
+Music_listeningModerately frequently  0.661266   1.138221  0.5810
+Music_listeningFrequently             0.372385   1.112223  0.3348
+Music_listeningVery frequently        0.639700   1.101369  0.5808
+Practice                             -0.002229   0.006700 -0.3326
+FloorUpstairs                         0.322170   0.322950  0.9976
+
+Intercepts:
+                                                         Value   Std. Error
+Not at all|A small amount of the time                    -1.6440  1.1589   
+A small amount of the time|A moderate amount of the time -0.3189  1.1516   
+A moderate amount of the time|Most of the time            0.8237  1.1603   
+Most of the time|All of the time                          2.6953  1.2177   
+                                                         t value
+Not at all|A small amount of the time                    -1.4187
+A small amount of the time|A moderate amount of the time -0.2769
+A moderate amount of the time|Most of the time            0.7099
+Most of the time|All of the time                          2.2134
+
+Residual Deviance: 446.8888 
+AIC: 472.8888 
+
+Stepwise Model Summary for Life_experiences :
+Call:
+polr(formula = Life_experiences ~ Age, data = completed_data2, 
+    control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, 
+    method = "logistic")
+
+Coefficients:
+       Value Std. Error t value
+Age -0.02321   0.007526  -3.084
+
+Intercepts:
+                                                         Value   Std. Error
+Not at all|A small amount of the time                    -2.2314  0.4877   
+A small amount of the time|A moderate amount of the time -0.9508  0.4634   
+A moderate amount of the time|Most of the time            0.1533  0.4620   
+Most of the time|All of the time                          1.9787  0.5738   
+                                                         t value
+Not at all|A small amount of the time                    -4.5756
+A small amount of the time|A moderate amount of the time -2.0520
+A moderate amount of the time|Most of the time            0.3318
+Most of the time|All of the time                          3.4484
+
+Residual Deviance: 454.8045 
+AIC: 464.8045 
+
+Summary for Media :
+Call:
+polr(formula = formula, data = completed_data2, control = list(maxit = 1000), 
+    na.action = na.exclude, Hess = TRUE, method = "logistic")
+
+Coefficients:
+                                         Value Std. Error t value
+Age                                  -0.014767   0.009688 -1.5242
+GenderFemale                         -0.418432   0.378492 -1.1055
+GenderOther                           1.745932   1.760154  0.9919
+Music_listeningSomewhat rarely       -1.040284   1.273809 -0.8167
+Music_listeningModerately frequently -1.458039   1.169141 -1.2471
+Music_listeningFrequently            -2.219542   1.160230 -1.9130
+Music_listeningVery frequently       -1.481384   1.107480 -1.3376
+Practice                             -0.002888   0.008554 -0.3377
+FloorUpstairs                         0.485236   0.449504  1.0795
+
+Intercepts:
+                                                         Value   Std. Error
+Not at all|A small amount of the time                    -1.2535  1.2067   
+A small amount of the time|A moderate amount of the time -0.1662  1.2057   
+A moderate amount of the time|Most of the time            1.0471  1.2564   
+Most of the time|All of the time                          1.7598  1.3207   
+                                                         t value
+Not at all|A small amount of the time                    -1.0388
+A small amount of the time|A moderate amount of the time -0.1379
+A moderate amount of the time|Most of the time            0.8335
+Most of the time|All of the time                          1.3325
+
+Residual Deviance: 254.7326 
+AIC: 280.7326 
+
+Stepwise Model Summary for Media :
+Call:
+polr(formula = Media ~ Age, data = completed_data2, control = list(maxit = 1000), 
+    na.action = na.exclude, Hess = TRUE, method = "logistic")
+
+Coefficients:
+       Value Std. Error t value
+Age -0.01828   0.008859  -2.063
+
+Intercepts:
+                                                         Value   Std. Error
+Not at all|A small amount of the time                     0.0223  0.5194   
+A small amount of the time|A moderate amount of the time  1.0413  0.5382   
+A moderate amount of the time|Most of the time            2.2217  0.6322   
+Most of the time|All of the time                          2.9362  0.7518   
+                                                         t value
+Not at all|A small amount of the time                     0.0428
+A small amount of the time|A moderate amount of the time  1.9347
+A moderate amount of the time|Most of the time            3.5140
+Most of the time|All of the time                          3.9053
+
+Residual Deviance: 264.7478 
+AIC: 274.7478 
+
+Summary for Music :
+Call:
+polr(formula = formula, data = completed_data2, control = list(maxit = 1000), 
+    na.action = na.exclude, Hess = TRUE, method = "logistic")
+
+Coefficients:
+                                        Value Std. Error  t value
+Age                                  -0.01629   0.007932 -2.05327
+GenderFemale                          0.82657   0.301034  2.74576
+GenderOther                          -2.61964   1.686989 -1.55285
+Music_listeningSomewhat rarely        2.04670   1.261994  1.62180
+Music_listeningModerately frequently  1.70255   1.148173  1.48283
+Music_listeningFrequently             1.96472   1.130080  1.73856
+Music_listeningVery frequently        2.46608   1.127378  2.18745
+Practice                              0.02553   0.007191  3.55084
+FloorUpstairs                         0.02884   0.322875  0.08932
+
+Intercepts:
+                                                         Value   Std. Error
+Not at all|A small amount of the time                    -1.1988  1.2055   
+A small amount of the time|A moderate amount of the time  0.0423  1.1665   
+A moderate amount of the time|Most of the time            1.4714  1.1704   
+Most of the time|All of the time                          3.0368  1.1918   
+                                                         t value
+Not at all|A small amount of the time                    -0.9944
+A small amount of the time|A moderate amount of the time  0.0363
+A moderate amount of the time|Most of the time            1.2572
+Most of the time|All of the time                          2.5481
+
+Residual Deviance: 423.7763 
+AIC: 449.7763 
+
+Stepwise Model Summary for Music :
+Call:
+polr(formula = Music ~ Age + Gender + Practice, data = completed_data2, 
+    control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, 
+    method = "logistic")
+
+Coefficients:
+                Value Std. Error t value
+Age          -0.01531   0.007775  -1.969
+GenderFemale  0.86120   0.298794   2.882
+GenderOther  -2.55159   1.550274  -1.646
+Practice      0.02563   0.006907   3.711
+
+Intercepts:
+                                                         Value   Std. Error
+Not at all|A small amount of the time                    -3.1609  0.6112   
+A small amount of the time|A moderate amount of the time -1.9195  0.5304   
+A moderate amount of the time|Most of the time           -0.5277  0.5013   
+Most of the time|All of the time                          0.9690  0.5088   
+                                                         t value
+Not at all|A small amount of the time                    -5.1716
+A small amount of the time|A moderate amount of the time -3.6190
+A moderate amount of the time|Most of the time           -1.0525
+Most of the time|All of the time                          1.9044
+
+Residual Deviance: 431.5091 
+AIC: 447.5091 
+
+Summary for Future_plans :
+Call:
+polr(formula = formula, data = completed_data2, control = list(maxit = 1000), 
+    na.action = na.exclude, Hess = TRUE, method = "logistic")
+
+Coefficients:
+                                         Value Std. Error t value
+Age                                  -0.049178   0.009085 -5.4130
+GenderFemale                         -0.521204   0.320155 -1.6280
+GenderOther                           1.038271   1.763543  0.5887
+Music_listeningSomewhat rarely        1.020515   1.474591  0.6921
+Music_listeningModerately frequently  1.915889   1.357161  1.4117
+Music_listeningFrequently             0.974863   1.335568  0.7299
+Music_listeningVery frequently        1.127313   1.323362  0.8519
+Practice                             -0.005839   0.007837 -0.7450
+FloorUpstairs                         0.089231   0.350752  0.2544
+
+Intercepts:
+                                                         Value   Std. Error
+Not at all|A small amount of the time                    -2.0270  1.3637   
+A small amount of the time|A moderate amount of the time -0.7584  1.3540   
+A moderate amount of the time|Most of the time            0.3940  1.3626   
+Most of the time|All of the time                          2.0334  1.4183   
+                                                         t value
+Not at all|A small amount of the time                    -1.4863
+A small amount of the time|A moderate amount of the time -0.5601
+A moderate amount of the time|Most of the time            0.2892
+Most of the time|All of the time                          1.4337
+
+Residual Deviance: 368.5973 
+AIC: 394.5973 
+
+Stepwise Model Summary for Future_plans :
+Call:
+polr(formula = Future_plans ~ Age, data = completed_data2, control = list(maxit = 1000), 
+    na.action = na.exclude, Hess = TRUE, method = "logistic")
+
+Coefficients:
+       Value Std. Error t value
+Age -0.04844   0.008473  -5.716
+
+Intercepts:
+                                                         Value   Std. Error
+Not at all|A small amount of the time                    -2.8775  0.5213   
+A small amount of the time|A moderate amount of the time -1.6763  0.4826   
+A moderate amount of the time|Most of the time           -0.5824  0.4821   
+Most of the time|All of the time                          1.0213  0.5969   
+                                                         t value
+Not at all|A small amount of the time                    -5.5204
+A small amount of the time|A moderate amount of the time -3.4735
+A moderate amount of the time|Most of the time           -1.2079
+Most of the time|All of the time                          1.7110
+
+Residual Deviance: 379.2868 
+AIC: 389.2868 
+
+Summary for Building :
+Call:
+polr(formula = formula, data = completed_data2, control = list(maxit = 1000), 
+    na.action = na.exclude, Hess = TRUE, method = "logistic")
+
+Coefficients:
+                                          Value Std. Error    t value
+Age                                  -0.0118148  0.0084224 -1.403e+00
+GenderFemale                         -0.3221204  0.3227017 -9.982e-01
+GenderOther                          -7.5509662  0.0001072 -7.046e+04
+Music_listeningSomewhat rarely       12.1980380  0.6715294  1.816e+01
+Music_listeningModerately frequently 13.1377710  0.3499477  3.754e+01
+Music_listeningFrequently            13.2159282  0.3110147  4.249e+01
+Music_listeningVery frequently       13.4396786  0.2940905  4.570e+01
+Practice                              0.0004061  0.0071390  5.689e-02
+FloorUpstairs                         0.4698345  0.3617385  1.299e+00
+
+Intercepts:
+                                                         Value      
+Not at all|A small amount of the time                        13.0624
+A small amount of the time|A moderate amount of the time     14.3599
+A moderate amount of the time|Most of the time               15.1709
+Most of the time|All of the time                             16.7208
+                                                         Std. Error 
+Not at all|A small amount of the time                         0.5236
+A small amount of the time|A moderate amount of the time      0.5409
+A moderate amount of the time|Most of the time                0.5749
+Most of the time|All of the time                              0.7658
+                                                         t value    
+Not at all|A small amount of the time                        24.9449
+A small amount of the time|A moderate amount of the time     26.5481
+A moderate amount of the time|Most of the time               26.3892
+Most of the time|All of the time                             21.8336
+
+Residual Deviance: 339.3886 
+AIC: 365.3886 
+
+Stepwise Model Summary for Building :
+Call:
+polr(formula = Building ~ Floor, data = completed_data2, control = list(maxit = 1000), 
+    na.action = na.exclude, Hess = TRUE, method = "logistic")
+
+Coefficients:
+               Value Std. Error t value
+FloorUpstairs 0.5322     0.3448   1.544
+
+Intercepts:
+                                                         Value  Std. Error
+Not at all|A small amount of the time                    0.7560 0.2902    
+A small amount of the time|A moderate amount of the time 2.0077 0.3307    
+A moderate amount of the time|Most of the time           2.7995 0.3862    
+Most of the time|All of the time                         4.3354 0.6375    
+                                                         t value
+Not at all|A small amount of the time                    2.6055 
+A small amount of the time|A moderate amount of the time 6.0712 
+A moderate amount of the time|Most of the time           7.2498 
+Most of the time|All of the time                         6.8011 
+
+Residual Deviance: 348.4312 
+AIC: 358.4312 
+
+Summary for Everyday :
+Call:
+polr(formula = formula, data = completed_data2, control = list(maxit = 1000), 
+    na.action = na.exclude, Hess = TRUE, method = "logistic")
+
+Coefficients:
+                                         Value Std. Error t value
+Age                                  -0.031175   0.008423 -3.7013
+GenderFemale                          0.076485   0.312460  0.2448
+GenderOther                           0.206156   1.763886  0.1169
+Music_listeningSomewhat rarely        0.166038   1.493834  0.1111
+Music_listeningModerately frequently  1.065151   1.380773  0.7714
+Music_listeningFrequently             0.876582   1.356878  0.6460
+Music_listeningVery frequently        0.665583   1.347006  0.4941
+Practice                             -0.008504   0.007142 -1.1907
+FloorUpstairs                         0.289151   0.348523  0.8296
+
+Intercepts:
+                                                         Value   Std. Error
+Not at all|A small amount of the time                    -1.0976  1.3763   
+A small amount of the time|A moderate amount of the time  0.6742  1.3736   
+A moderate amount of the time|Most of the time            2.6964  1.4315   
+Most of the time|All of the time                          2.9283  1.4488   
+                                                         t value
+Not at all|A small amount of the time                    -0.7975
+A small amount of the time|A moderate amount of the time  0.4908
+A moderate amount of the time|Most of the time            1.8837
+Most of the time|All of the time                          2.0211
+
+Residual Deviance: 337.4953 
+AIC: 363.4953 
+
+Stepwise Model Summary for Everyday :
+Call:
+polr(formula = Everyday ~ Age, data = completed_data2, control = list(maxit = 1000), 
+    na.action = na.exclude, Hess = TRUE, method = "logistic")
+
+Coefficients:
+       Value Std. Error t value
+Age -0.03201   0.007952  -4.025
+
+Intercepts:
+                                                         Value   Std. Error
+Not at all|A small amount of the time                    -1.9759  0.4950   
+A small amount of the time|A moderate amount of the time -0.2442  0.4655   
+A moderate amount of the time|Most of the time            1.7548  0.5995   
+Most of the time|All of the time                          1.9877  0.6393   
+                                                         t value
+Not at all|A small amount of the time                    -3.9916
+A small amount of the time|A moderate amount of the time -0.5245
+A moderate amount of the time|Most of the time            2.9269
+Most of the time|All of the time                          3.1093
+
+Residual Deviance: 342.3099 
+AIC: 352.3099 </code></pre>
+</div>
+</div>
+<p>Here are the models for the second half of the data.</p>
+<p>Models that match with the first half:</p>
+<ul>
+<li><p>polr(formula = Fictional_story ~ Age, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “logistic”)</p></li>
+<li><p>polr(formula = Sensory_sensations ~ 1, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “logistic”)</p></li>
+<li><p>polr(formula = Media ~ Age, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “logistic”)</p></li>
+<li><p>polr(formula = Future_plans ~ Age, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “logistic”)</p></li>
+<li><p>polr(formula = Everyday ~ Age, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “logistic”)</p></li>
+</ul>
+<p>Models that don’t match the first half:</p>
+<ul>
+<li><p>polr(formula = Abstract_shapes ~ 1, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “logistic”)</p></li>
+<li><p>polr(formula = Life_experiences ~ Age, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “logistic”)</p></li>
+<li><p>polr(formula = Music ~ Age + Gender + Practice, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “logistic”)</p></li>
+<li><p>polr(formula = Building ~ Floor, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “logistic”)</p></li>
+</ul>
 
 
 
@@ -1075,7 +1656,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
+      var filterRegex = new RegExp("https:\/\/hw3446\.github\.io\/Final_Project_PUC\/");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
