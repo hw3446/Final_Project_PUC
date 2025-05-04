@@ -1,5 +1,5 @@
 ---
-title: "Tutorial"
+title: "Tutorial on Ordinal Regression in a Concert Study"
 listing:
   contents: posts
   sort: "date desc"
