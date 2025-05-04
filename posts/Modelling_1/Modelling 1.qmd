@@ -4,6 +4,12 @@ author: "Hannah Wilkie"
 image: "Audience.png"
 execute:
   warning: false
+  eval: true
+  echo: true
+format:
+  html:
+    toc: true
+    code-fold: false
 ---
 
 ```{r}
