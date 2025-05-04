@@ -157,23 +157,23 @@ for (outcome in outcome_vars) {
 
 From the above, we can see that the models with the lowest AIC (using just main effects) are as follows:
 
-Fictional story: polr(formula = Fictional_story \~ Age, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "probit")
+-   Fictional story: polr(formula = Fictional_story \~ Age, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "probit")
 
-Abstract shapes: polr(formula = Abstract_shapes \~ Age, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "probit")
+-   Abstract shapes: polr(formula = Abstract_shapes \~ Age, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "probit")
 
-Sensory sensations: polr(formula = Sensory_sensations \~ 1, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "probit")
+-   Sensory sensations: polr(formula = Sensory_sensations \~ 1, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "probit")
 
-Life experiences: polr(formula = Life_experiences \~ Age + Gender, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "probit")
+-   Life experiences: polr(formula = Life_experiences \~ Age + Gender, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "probit")
 
-Media: polr(formula = Media \~ Age, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "probit")
+-   Media: polr(formula = Media \~ Age, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "probit")
 
-Music: polr(formula = Music \~ Music_listening + Practice, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "probit")
+-   Music: polr(formula = Music \~ Music_listening + Practice, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "probit")
 
-Future plans: polr(formula = Future_plans \~ Age, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "probit")
+-   Future plans: polr(formula = Future_plans \~ Age, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "probit")
 
-Building: polr(formula = Building \~ Age + Gender + Music_listening + Floor, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "probit")
+-   Building: polr(formula = Building \~ Age + Gender + Music_listening + Floor, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "probit")
 
-Everyday: polr(formula = Everyday \~ Age, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "probit")
+-   Everyday: polr(formula = Everyday \~ Age, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "probit")
 
 Let's also look at the interactions between the demographic variables and check for multicollinearity.
 
@@ -264,22 +264,22 @@ Here are the models for the second half of the data.
 
 Models that match with the first half:
 
-polr(formula = Fictional_story \~ Age, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "logistic")
+-   polr(formula = Fictional_story \~ Age, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "logistic")
 
-polr(formula = Sensory_sensations \~ 1, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "logistic")
+-   polr(formula = Sensory_sensations \~ 1, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "logistic")
 
-polr(formula = Media \~ Age, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "logistic")
+-   polr(formula = Media \~ Age, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "logistic")
 
-polr(formula = Future_plans \~ Age, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "logistic")
+-   polr(formula = Future_plans \~ Age, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "logistic")
 
-polr(formula = Everyday \~ Age, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "logistic")
+-   polr(formula = Everyday \~ Age, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "logistic")
 
 Models that don't match the first half:
 
-polr(formula = Abstract_shapes \~ 1, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "logistic")
+-   polr(formula = Abstract_shapes \~ 1, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "logistic")
 
-polr(formula = Life_experiences \~ Age, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "logistic")
+-   polr(formula = Life_experiences \~ Age, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "logistic")
 
-polr(formula = Music \~ Age + Gender + Practice, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "logistic")
+-   polr(formula = Music \~ Age + Gender + Practice, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "logistic")
 
-polr(formula = Building \~ Floor, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "logistic")
+-   polr(formula = Building \~ Floor, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "logistic")
