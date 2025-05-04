@@ -9,7 +9,7 @@ execute:
 
 This dataset examines the musical imaginings that people experience in a live concert setting. The data was collected in a survey format.
 
-For some background, the survey in question was distributed at a classical concert in the Princeton University Concerts series (Feb 20th, 2025). During the concert’s intermission, and at the end of the concert, audience members answered a series of questions designed to scrutinise the nature of their imaginative responses to the music performed. Distribution was via both paper surveys, and online using Qualtrics. In each part of the survey, the audience were asked about the frequency with which they experienced different types of thought, memory and imagining. They then identified the musical movements during which they imagined the most vivid fictional scenes and memories, and provided free-text responses describing these.
+For some background, the survey in question was distributed at a classical concert in Richardson Auditorium, Princeton (Feb 20th, 2025). During the concert’s intermission, and at the end of the concert, audience members answered a series of questions designed to scrutinise the nature of their imaginative responses to the music performed. Distribution was via both paper surveys, and online using Qualtrics. In each part of the survey, the audience were asked about the frequency with which they experienced different types of thought, memory and imagining. They then identified the musical movements during which they imagined the most vivid fictional scenes and memories, and provided free-text responses describing these.
 
 You can find a PDF of the paper survey here for reference:
 
