@@ -1,0 +1,66 @@
+---
+title: "Summary"
+format: html
+---
+
+In this blog we examined a dataset on musical imaginings collected during a live concert. After visualising counts for different thought types counts for memories or stories within a given movement, we moved on to running ordinal regression models. These models showed the relationship between thought types and demographic variables for each half of the concert.
+
+An example model was run for fictional story with age as a predictor. When compared against a model with gender as an interaction variable, there was no significant improvement into the model. Final model selection was achieved using the step() function in R, which tests different combinations of main effects variables to keep the model with the lowest AIC. After running this, we were able to identify main effects ordinal regression models for most of the thought types in our dataset. We could then collate these models and calculate final summary statistics.
+
+Here's a summary of the main effects for likelihood of different thought types in each half of the concert:
+
+Fictional story
+
+-   First half: Age (estimate -0.018, p = 0.0098)
+
+-   Second half: Age (estimate -0.02, p = 0.0093)
+
+Abstract shapes
+
+-   First half: Age (estimate -0.013, p = 0.077)
+
+-   Second half: no main effect
+
+Sensory sensations
+
+-   First half: no main effect
+
+-   Second half: no main effect
+
+Life experiences
+
+-   First half: Age (estimate -0.018, p \< 0.001)
+
+-   Second half: Age (estimate -0.014, p = 0.0013
+
+Media
+
+-   First half: Age (estimate -0.012, p = 0.01)
+
+-   Second half: Age ( estimate -0.014, p = 0.0016)
+
+Music
+
+-   First half: Frequency of classical music listening, and number of years of regular daily practice of a musical instrument (estimate 0.01, p = 0.01)
+
+-   Second half: Gender, number of years of regular daily practice of a musical instrument (estimate 0.014, p \< 0.001), Age
+
+Future plans
+
+-   First half: Age (estimate -0.027, p\<0.01)
+
+-   Second half: Age (estimate -0.027, p \< 0.01)
+
+The concert building
+
+-   First half: Age (estimate -0.015, p = 0.001), Gender and frequency of classical music listening
+
+-   Second half: Floor (Upstairs estimate = 0.30, p = 0.1)
+
+Everyday stuff
+
+-   First half: Age (estimate -0.015, p \< 0.001)
+
+-   Second half: Age (-0.019, p \< 0.001)
+
+In general older patrons were less likely to experience particular thought types. There is also a marked distinction in both halves for thoughts about the music and thoughts about the building in terms of demographic predictors. Future work will focus on scrutinizing these distinctions, identifying possible causes for any discrepancies between the two halves of the concert, and doing further analysis with demographic predictors for movement selection.

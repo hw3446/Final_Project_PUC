@@ -260,41 +260,26 @@ for (outcome in outcome_vars) {
 
 ```
 
-The models for the second half of the data are:
+Here are the models for the second half of the data.
 
-```         
-polr(formula = Fictional_story ~ Age, data = completed_data2,      control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE,      method = "logistic")
-```
+Models that match with the first half:
 
-```         
-polr(formula = Abstract_shapes ~ 1, data = completed_data2, control = list(maxit = 1000), 
-    na.action = na.exclude, Hess = TRUE, method = "logistic")
-```
+polr(formula = Fictional_story \~ Age, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "logistic")
 
-```         
-polr(formula = Sensory_sensations ~ 1, data = completed_data2,      control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE,      method = "logistic")
-```
+polr(formula = Sensory_sensations \~ 1, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "logistic")
 
-```         
-polr(formula = Life_experiences ~ Age, data = completed_data2,      control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE,      method = "logistic")
-```
+polr(formula = Media \~ Age, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "logistic")
 
-```         
-polr(formula = Media ~ Age, data = completed_data2, control = list(maxit = 1000),      na.action = na.exclude, Hess = TRUE, method = "logistic") 
-```
+polr(formula = Future_plans \~ Age, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "logistic")
 
-```         
-polr(formula = Music ~ Age + Gender + Practice, data = completed_data2,      control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE,      method = "logistic")
-```
+polr(formula = Everyday \~ Age, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "logistic")
 
-```         
-polr(formula = Future_plans ~ Age, data = completed_data2, control = list(maxit = 1000),      na.action = na.exclude, Hess = TRUE, method = "logistic")
-```
+Models that don't match the first half:
 
-```         
-polr(formula = Building ~ Floor, data = completed_data2, control = list(maxit = 1000),      na.action = na.exclude, Hess = TRUE, method = "logistic")
-```
+polr(formula = Abstract_shapes \~ 1, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "logistic")
 
-```         
-polr(formula = Everyday ~ Age, data = completed_data2, control = list(maxit = 1000),      na.action = na.exclude, Hess = TRUE, method = "logistic") 
-```
+polr(formula = Life_experiences \~ Age, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "logistic")
+
+polr(formula = Music \~ Age + Gender + Practice, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "logistic")
+
+polr(formula = Building \~ Floor, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "logistic")

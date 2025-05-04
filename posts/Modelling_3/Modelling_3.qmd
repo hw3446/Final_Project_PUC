@@ -207,7 +207,7 @@ ggplot(pred_building, aes(x = x, y = predicted, fill = response.level)) +
      theme(legend.position = "bottom")
 ```
 
-Let's do a little brant test:
+Let's do a brant test:
 
 ```{r}
 library(MASS)
