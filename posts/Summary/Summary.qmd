@@ -1,6 +1,7 @@
 ---
 title: "Summary"
 format: html
+author: "Hannah Wilkie"
 ---
 
 In this blog we examined a dataset on musical imaginings collected during a live concert. After visualising counts for different thought types counts for memories or stories within a given movement, we moved on to running ordinal regression models. These models showed the relationship between thought types and demographic variables for each half of the concert.
