@@ -6,7 +6,7 @@ website:
   navbar:
     right:
       - icon: github
-        href: https://github.com/
+        href: https://github.com/hw3446/Final_Project_PUC
         
 format:
   html:
