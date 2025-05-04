@@ -3,7 +3,11 @@ project:
 
 website:
   title: "Tutorial in Ordinal Regression for Concert Study"
-
+  navbar:
+    right:
+      - icon: github
+        href: https://github.com/
+        
 format:
   html:
     theme: cosmo
