@@ -14,7 +14,7 @@ Fictional story
 
 -   First half: Age (estimate -0.018, p = 0.0098)
 
--   Second half: Age (estimate -0.02, p = 0.0093)
+-   Second half: Age (estimate -0.020, p = 0.0093)
 
 Abstract shapes
 
@@ -36,15 +36,15 @@ Life experiences
 
 Media
 
--   First half: Age (estimate -0.012, p = 0.01)
+-   First half: Age (estimate -0.012, p = 0.010)
 
 -   Second half: Age ( estimate -0.014, p = 0.0016)
 
 Music
 
--   First half: Frequency of classical music listening, and number of years of regular daily practice of a musical instrument (estimate 0.01, p = 0.01)
+-   First half: Frequency of classical music listening, and Number of years of regular daily practice of a musical instrument (estimate 0.01, p = 0.010)
 
--   Second half: Gender, number of years of regular daily practice of a musical instrument (estimate 0.014, p \< 0.001), Age
+-   Second half: Gender, Number of years of regular daily practice of a musical instrument (estimate 0.014, p \< 0.001), Age
 
 Future plans
 
@@ -54,9 +54,9 @@ Future plans
 
 The concert building
 
--   First half: Age (estimate -0.015, p = 0.001), Gender and frequency of classical music listening
+-   First half: Age (estimate -0.015, p = 0.001), Gender, Frequency of classical music listening, and Floor (Upstairs estimate = 0.32, p = 0.11)
 
--   Second half: Floor (Upstairs estimate = 0.30, p = 0.1)
+-   Second half: Floor (Upstairs estimate = 0.30, p = 0.10)
 
 Everyday stuff
 
@@ -64,4 +64,4 @@ Everyday stuff
 
 -   Second half: Age (-0.019, p \< 0.001)
 
-In general older patrons were less likely to experience particular thought types. There is also a marked distinction in both halves for thoughts about the music and thoughts about the building in terms of demographic predictors. Future work will focus on scrutinizing these distinctions, identifying possible causes for any discrepancies between the two halves of the concert, and doing further analysis with demographic predictors for movement selection.
+In general older patrons were less likely to experience particular thought types. There is also a marked distinction in both halves for thoughts about the music and thoughts about the building in terms of demographic predictors. This suggests that there is a special combination of factors that predicts these thoughts in paticular. The relatively strong degree of consistency between the two halves though nevertheless supports the utility of the ordinal regression models, methods for model selection, and the demographic predictors at play. Future work will focus on scrutinizing these distinctions, identifying possible causes for any discrepancies between the two halves of the concert, and doing further analysis with demographic predictors for movement selection.
