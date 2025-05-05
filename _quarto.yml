@@ -7,6 +7,21 @@ website:
     right:
       - icon: github
         href: https://github.com/hw3446/Final_Project_PUC
+    left:
+      - href: index.qmd
+        text: Home
+      - href: posts/Dataset_overview/Dataset_overview.qmd
+        text: Dataset Overview
+      - href: posts/Descriptive_1/Descriptive_1.qmd
+        text: Descriptive 1
+      - href: posts/Modelling_1/Modelling_1.qmd
+        text: Modelling 1
+      - href: posts/Modelling_2/Modelling_2.qmd
+        text: Modelling 2
+      - href: posts/Modelling_3/Modelling_3.qmd
+        text: Modelling 3
+      - href: posts/Summary/Summary.qmd
+        text: Summary
         
 format:
   html:
