@@ -12,7 +12,7 @@ format:
     code-fold: false
 ---
 
-In this section, we'll discuss how to model some of our data using ordinal regression. This will examine the relationship between demographic data and thought types.
+We'll now discuss how to model some of our data using ordinal regression. This will examine the relationship between demographic data and thought types.
 
 ```{r}
 library(tidyverse)

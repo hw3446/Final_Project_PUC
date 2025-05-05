@@ -21,6 +21,7 @@ library(dplyr)
 library(corrplot)
 library(car)
 library(knitr)
+library(emmeans)
 ```
 
 First some data loading, and demographic variable tidying.
@@ -30,8 +31,6 @@ data1 <- read_csv("https://raw.githubusercontent.com/hw3446/Final_Project_PUC/ma
 
 data2 <- read_csv("https://raw.githubusercontent.com/hw3446/Final_Project_PUC/main/posts/Dataset_overview/working_data/data2.csv")
 ```
-
-Let's tidy our outcome and demographic variables.
 
 ```{r}
 outcome_vars <- c("Fictional_story", "Abstract_shapes", "Sensory_sensations", 
@@ -71,7 +70,7 @@ data2$Floor <- factor(data2$Floor, levels = c('Downstairs', 'Upstairs'))
 
 We also have some NAs in our dataframe, so before running the models, we need to figure out what to do with these.
 
-First a map of our missing data:
+Here's a map of our missing data:
 
 ```{r}
 

@@ -5,7 +5,7 @@ execute:
   warning: false
 ---
 
-In this section we'll look at the overall distribution of different thought types and movements in the data.
+In this section, we'll look at the overall distribution of different thought types and movements in the data.
 
 ```{r}
 library(tidyverse)

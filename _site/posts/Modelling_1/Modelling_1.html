@@ -171,6 +171,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
+<p>In this section, we’ll discuss how to model some of our data using ordinal regression. This will examine the relationship between demographic data and thought types.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
@@ -184,7 +185,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MASS)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>In this section, we’ll discuss how to model some of our data using ordinal regression. This will examine the relationship between demographic data and thought types.</p>
 <p>Let’s reload our data from each half of the concert:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>data1 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://raw.githubusercontent.com/hw3446/Final_Project_PUC/main/posts/Dataset_overview/working_data/data.csv"</span>)</span>
@@ -228,7 +228,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>data2<span class="sc">$</span>Floor <span class="ot">&lt;-</span> <span class="fu">factor</span>(data2<span class="sc">$</span>Floor, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">'Downstairs'</span>, <span class="st">'Upstairs'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Let’s start with a simple model that considers the likelihood of imagining a fictional story based on a particular demographic variable. We’ll just use the data from the first half of the concert.</p>
-<p>Here’s a plot showing the percentage of participants in each ordinal level for fictional story, by gender and age. We’re ignoring N/As for now:</p>
+<p>Here are some plots showing the percentage of participants in each ordinal level for fictional story, by gender and age. We’re ignoring N/As for now.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>data1 <span class="ot">&lt;-</span> data1 <span class="sc">%&gt;%</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Age) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(Gender) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(Fictional_story)) <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Gender <span class="sc">!=</span> <span class="st">'Other'</span>)</span>
@@ -240,7 +240,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(fiction_gender, <span class="fu">aes</span>(<span class="at">x =</span> Fictional_story, <span class="at">y =</span> Percentage, <span class="at">fill =</span> Gender)) <span class="sc">+</span></span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Level"</span>, <span class="at">y =</span> <span class="st">"Percentage"</span>, <span class="at">fill =</span> <span class="st">"Gender"</span>) <span class="sc">+</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Percentage in Each Level for Fictional Story by Gender"</span>) <span class="sc">+</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Percentage in Each Level of Fictional Story by Gender"</span>) <span class="sc">+</span></span>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span>   <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
@@ -288,7 +288,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(fiction_age_grouped, <span class="fu">aes</span>(<span class="at">x =</span> Fictional_story, <span class="at">y =</span> Percentage, <span class="at">fill =</span> Age_grouped)) <span class="sc">+</span></span>
 <span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
 <span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Fictional_story"</span>, <span class="at">y =</span> <span class="st">"Percentage"</span>, <span class="at">fill =</span> <span class="st">"Age Group"</span>) <span class="sc">+</span></span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Percentage in Each Level for Fictional Story by Age Group"</span>) <span class="sc">+</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Percentage in Each Level of Fictional Story by Age Group"</span>) <span class="sc">+</span></span>
 <span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span>   <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
@@ -298,7 +298,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>To create an ordinal regression model, we can use the polr() function. An alternative is clm(), but we won’t be using that here for reasons that will become clear in the next post. Here’s a simple example showing the relationship between age and likelihood of imagining a fictional story based on data from the first half of the concert.</p>
+<p>Now let’s look at creating ordinal regression models from the above. To make an ordinal regression model, we can use the polr() function. An alternative is clm(), but we won’t be using that here for reasons that will become clear in the next post. Here’s a simple example showing the relationship between age and likelihood of imagining a fictional story based on data from the first half of the concert.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>model_fiction_age <span class="ot">&lt;-</span> <span class="fu">polr</span>(Fictional_story <span class="sc">~</span> Age, <span class="at">data =</span> data1, <span class="at">Hess =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -390,7 +390,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>It’s also good to run a brant test to tell us whether the proportional odds assumption holds in our current model. The assumption is that the relationship between predictor and output is the same across all levels of the ordinal outcomes.</p>
+<p>It’s also good to run a brant test — this tells us whether the proportional odds assumption holds in our current model. The assumption is that the relationship between predictor and output is the same across all levels of the ordinal outcomes.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">brant.test</span>(model_fiction_age)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -525,7 +525,7 @@ H0: Proportional odds assumption holds</code></pre>
 </table>
 </div>
 </div>
-<p>The p value is still significantly above 0.05, so adding gender as an interaction variable doesn’t significantly improve the model.</p>
+<p>The p value is markedly above 0.05, so adding gender as an interaction variable doesn’t significantly improve the model.</p>
 <p>The question is, how can we select models with optimum demographic inputs? This is what will be covered in the ‘Model Selection’ portion of this blog.</p>
 
 

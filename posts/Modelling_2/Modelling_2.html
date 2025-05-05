@@ -169,19 +169,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
+<p>In this section, we’ll experiment with the step() function in R to help select ordinal regression models for our data.</p>
+<p>step() is not compatible with clm(), which is why we’ll use polr().</p>
+<p>The step() function starts with a full model containing all the possible main effects (in this case all the possible demographic variables). It tests different combinations of variables and then keeps the model with the lowest AIC.</p>
+<p>This is helpful when we’re dealing with lots of different outcome variables and lots of demographic inputs and we need to figure out which ones to use.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MASS)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(corrplot)</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(car)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(emmeans)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>In this section, we’ll experiment with the step() function in R to help select ordinal regression models for our data.</p>
-<p>step() is not compatible with clm(), which is why we’ll use polr().</p>
-<p>The step() function starts with a full model containing all the possible main effects (in this case all the possible demographic variables). It tests different combinations of variables and then keeps the model with the lowest AIC.</p>
-<p>This is helpful when we’re dealing with lots of different outcome variables and lots of demographic inputs and we need to figure out which ones to use.</p>
-<p>Here’s how we’d run the step() function starting with all the demographic variables and using just fictional story as our outcome.</p>
 <p>First some data loading, and demographic variable tidying.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>data1 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://raw.githubusercontent.com/hw3446/Final_Project_PUC/main/posts/Dataset_overview/working_data/data.csv"</span>)</span>
@@ -223,8 +223,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>data1<span class="sc">$</span>Floor <span class="ot">&lt;-</span> <span class="fu">factor</span>(data1<span class="sc">$</span>Floor, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">'Downstairs'</span>, <span class="st">'Upstairs'</span>))</span>
 <span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>data2<span class="sc">$</span>Floor <span class="ot">&lt;-</span> <span class="fu">factor</span>(data2<span class="sc">$</span>Floor, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">'Downstairs'</span>, <span class="st">'Upstairs'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>We have some NAs in our dataframe, so before running the models, we need to figure out what to do with these.</p>
-<p>Let’s get a map of our missing data:</p>
+<p>We also have some NAs in our dataframe, so before running the models, we need to figure out what to do with these.</p>
+<p>Here’s a map of our missing data:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Amelia)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>demographics_outcomes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">'Age'</span>, <span class="st">'Gender'</span>, <span class="st">'Music_listening'</span>, <span class="st">'Practice'</span>, <span class="st">'Floor'</span>, <span class="st">"Fictional_story"</span>, <span class="st">"Abstract_shapes"</span>, <span class="st">"Sensory_sensations"</span>, </span>
@@ -259,15 +259,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>imputed_data1 <span class="ot">&lt;-</span> <span class="fu">mice</span>(data1, <span class="at">m =</span> <span class="dv">5</span>, <span class="at">method =</span> <span class="st">'pmm'</span>, <span class="at">seed =</span> <span class="dv">123</span>, <span class="at">print =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>completed_data1 <span class="ot">&lt;-</span> <span class="fu">complete</span>(imputed_data1, <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Let’s now run the step() function with our imputed data for fictional story.</p>
-<ol type="1">
-<li>Start by specifying the model with with maximum number of demographic inputs.</li>
-</ol>
+<p>Let’s now run the step() function with our imputed data. We’ll start the function using all of the demographic inputs, and have likelihood of imagining a fictional story as our outcome variable.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>model_fiction_imp <span class="ot">&lt;-</span> <span class="fu">polr</span>(Fictional_story <span class="sc">~</span> Age <span class="sc">+</span> Gender <span class="sc">+</span> Music_listening <span class="sc">+</span> Practice <span class="sc">+</span> Floor, </span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">data =</span> completed_data1, <span class="at">Hess =</span> <span class="cn">TRUE</span>, <span class="at">method =</span> <span class="st">"logistic"</span>)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>stepwise_model_imp <span class="ot">&lt;-</span> <span class="fu">step</span>(model_fiction_imp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Specifying a model with the maximum number of demographic inputs.</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>model_fiction_imp <span class="ot">&lt;-</span> <span class="fu">polr</span>(Fictional_story <span class="sc">~</span> Age <span class="sc">+</span> Gender <span class="sc">+</span> Music_listening <span class="sc">+</span> Practice <span class="sc">+</span> Floor, </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">data =</span> completed_data1, <span class="at">Hess =</span> <span class="cn">TRUE</span>, <span class="at">method =</span> <span class="st">"logistic"</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">#Running the step() function</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>stepwise_model_imp <span class="ot">&lt;-</span> <span class="fu">step</span>(model_fiction_imp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Start:  AIC=488.79
 Fictional_story ~ Age + Gender + Music_listening + Practice + 
@@ -341,8 +342,8 @@ Residual Deviance: 471.0048
 AIC: 481.0048 </code></pre>
 </div>
 </div>
-<p>Here step() ran through all the possible demographics to find the model with the lowest AIC. In this case the most successful model was one with just age as a demographic input.</p>
-<p>We can run the step() function looping through all the possible outcome variables using the imputed data.</p>
+<p>Here, step() ran through all the possible demographics to find the model with the lowest AIC (an estimator of prediction error). In this case the most successful model was one with just age as a demographic input.</p>
+<p>We can run the step() function and loop through all the possible outcome variables using the imputed data.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># List to store results</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>models <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
@@ -981,7 +982,7 @@ AIC: 434.6746 </code></pre>
 </div>
 <p>All vif() outputs are close to 1, indicating that multicollinearity shouldn’t be a problem.</p>
 <p>In the post on ‘Ordinal regression: final models’, we’ll use these step() results to run some final model visualisations.</p>
-<p>Rerunning the above steps for the second dataset:</p>
+<p>Let’s also just rerun the above steps for the second dataset.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>imputed_data2 <span class="ot">&lt;-</span> <span class="fu">mice</span>(data2, <span class="at">m =</span> <span class="dv">5</span>, <span class="at">method =</span> <span class="st">'pmm'</span>, <span class="at">seed =</span> <span class="dv">123</span>, <span class="at">print =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>completed_data2 <span class="ot">&lt;-</span> <span class="fu">complete</span>(imputed_data2, <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1560,6 +1561,7 @@ AIC: 352.3099 </code></pre>
 <li><p>polr(formula = Music ~ Age + Gender + Practice, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “logistic”)</p></li>
 <li><p>polr(formula = Building ~ Floor, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = “logistic”)</p></li>
 </ul>
+<p>We won’t create visualisations for these models in the next post, but in the final summary we will look at comparing their predictions with the predictions from the first half.</p>
 
 
 
