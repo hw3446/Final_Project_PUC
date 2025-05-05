@@ -6,7 +6,7 @@ execute:
   warning: false
 ---
 
-In the previous post, the step() function output the following models:
+In the previous post, the step() function output the following models for the first half of the concert:
 
 -   Fictional story: polr(formula = Fictional_story \~ Age, data = completed_data1, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "probit")
 
@@ -45,13 +45,15 @@ library(grid)
 library(gridExtra)
 ```
 
+Loading the data:
+
 ```{r}
 data1 <- read_csv("https://raw.githubusercontent.com/hw3446/Final_Project_PUC/main/posts/Dataset_overview/working_data/data.csv")
 
 data2 <- read_csv("https://raw.githubusercontent.com/hw3446/Final_Project_PUC/main/posts/Dataset_overview/working_data/data2.csv")
 ```
 
-First some data tidying and treatment of N/As (as in last post).
+Some data tidying and treatment of N/As (as in last post):
 
 ```{r}
 outcome_vars <- c("Fictional_story", "Abstract_shapes", "Sensory_sensations", 
@@ -111,7 +113,7 @@ life <- polr(formula = Life_experiences ~ Age + Gender, data = completed_data1, 
 
 ```
 
-Many of the models select age as the strongest predictor. Let's plot them using a loop.
+Many of the models select age as the strongest predictor. We can plot them using a loop.
 
 ```{r, fig.width=18, fig.height=8}
 
@@ -153,7 +155,7 @@ Age_thoughts_models <- grid.arrange(
 )
 ```
 
-Let's now tackle the plots with multiple predictors.
+Let's now tackle the plots with other predictors.
 
 ```{r, fig.width=10, fig.height=7}
 
@@ -207,7 +209,7 @@ ggplot(pred_building, aes(x = x, y = predicted, fill = response.level)) +
      theme(legend.position = "bottom")
 ```
 
-Let's do a brant test:
+We'll also do a brant test that loops through each of our models:
 
 ```{r}
 library(MASS)
@@ -235,7 +237,7 @@ lapply(models, function(model) {
 })
 ```
 
-And a summary of the latent coefficients with p values:
+Finally, a summary of the latent coefficients with p values:
 
 ```{r}
 library(tibble)

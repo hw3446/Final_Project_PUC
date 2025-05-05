@@ -15,17 +15,19 @@ You can find a PDF of the paper survey here for reference:
 
 <https://raw.githubusercontent.com/hw3446/Final_Project_PUC/59ab7bc00c7b9a0fc35517cc5b3335cf23fdc4ab/Paper_survey.pdf>
 
+In the following, we'll focus on loading the relevant data, cleaning and combining to produce workable dataframes for subsequent analysis.
+
 ```{r}
 library(tidyverse)
 library(broom)
 library(dplyr)
 library(ggplot2)
+library(conflicted)
 ```
 
 The data is in two halves for intermission and post-concert data. It is also divided into paper and online data. We'll start by loading all the intermission data.
 
 ```{r}
-library(conflicted)
 conflict_prefer("filter", "dplyr")
 
 data_paper <- read_csv("https://raw.githubusercontent.com/hw3446/Final_Project_PUC/main/input/PUC1.csv")
@@ -63,7 +65,7 @@ data_paper[, 18:20] <- lapply(data_paper[, 18:20], function(x) recode2[as.charac
 data_paper[, 24] <- lapply(data_paper[, 24], function(x) recode3[as.character(x)])
 ```
 
-In the qualtrics data there are some extra columns that we don't need, so we're getting rid of those.
+In the Qualtrics data there are some extra columns that we don't need, so we're getting rid of those.
 
 ```{r}
 data_qualtrics <- data_qualtrics %>% dplyr::filter(Finished == "TRUE") %>% 
@@ -137,7 +139,7 @@ data <- bind_rows(data_paper, final_qualtrics)
 data <- data%>% dplyr::select(-Movement_H_story, -Movement_B_story, -Piece_story, -Movement_H_mem, -Movement_B_mem, -Piece_mem)
 ```
 
-Note: to keep track of participants between each half of the survey, they were given a random ID in qualtrics, or were manually numbered in the paper data. We're keeping hold of these columns for now so we can match the demographic variables to the right participant when we load the post-concert data. But essentially, participants who were online won't have a participant number, and paper participants won't have an ID.
+Note: to keep track of participants between each half of the survey, they were given a random ID in Qualtrics, or were manually numbered in the paper data. We're keeping hold of these columns for now so we can match the demographic variables to the right participant when we load the post-concert data. But essentially, participants who were online won't have a participant number, and paper participants won't have an ID.
 
 ```{r}
 data[] <- lapply(data, function(col) {
@@ -224,7 +226,7 @@ data2[] <- lapply(data2, function(col) {
 datatable(data2)
 ```
 
-(These are the two dataframes that we'll be loading and working with in other sections of this blog.)
+These are the two dataframes that we'll be loading and working with in other sections of this blog.
 
 ```{r}
 write.csv(data, "working_data/data.csv", row.names = FALSE)

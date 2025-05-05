@@ -12,6 +12,8 @@ format:
     code-fold: false
 ---
 
+In this section, we'll discuss how to model some of our data using ordinal regression. This will examine the relationship between demographic data and thought types.
+
 ```{r}
 library(tidyverse)
 library(broom)
@@ -25,8 +27,6 @@ library(emmeans)
 library(knitr)
 library(MASS)
 ```
-
-In this section, we'll discuss how to model some of our data using ordinal regression. This will examine the relationship between demographic data and thought types.
 
 Let's reload our data from each half of the concert:
 
@@ -76,7 +76,7 @@ data2$Floor <- factor(data2$Floor, levels = c('Downstairs', 'Upstairs'))
 
 Let's start with a simple model that considers the likelihood of imagining a fictional story based on a particular demographic variable. We'll just use the data from the first half of the concert.
 
-Here's a plot showing the percentage of participants in each ordinal level for fictional story, by gender and age. We're ignoring N/As for now:
+Here are some plots showing the percentage of participants in each ordinal level for fictional story, by gender and age. We're ignoring N/As for now.
 
 ```{r}
 data1 <- data1 %>%
@@ -89,7 +89,7 @@ fiction_gender <- data1 %>%
 ggplot(fiction_gender, aes(x = Fictional_story, y = Percentage, fill = Gender)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(x = "Level", y = "Percentage", fill = "Gender") +
-  ggtitle("Percentage in Each Level for Fictional Story by Gender") +
+  ggtitle("Percentage in Each Level of Fictional Story by Gender") +
   theme_minimal() +   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
@@ -129,13 +129,13 @@ fiction_age_grouped <- data1 %>%
 ggplot(fiction_age_grouped, aes(x = Fictional_story, y = Percentage, fill = Age_grouped)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(x = "Fictional_story", y = "Percentage", fill = "Age Group") +
-  ggtitle("Percentage in Each Level for Fictional Story by Age Group") +
+  ggtitle("Percentage in Each Level of Fictional Story by Age Group") +
   theme_minimal() +   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
 ```
 
-To create an ordinal regression model, we can use the polr() function. An alternative is clm(), but we won't be using that here for reasons that will become clear in the next post. Here's a simple example showing the relationship between age and likelihood of imagining a fictional story based on data from the first half of the concert.
+Now let's look at creating ordinal regression models from the above. To make an ordinal regression model, we can use the polr() function. An alternative is clm(), but we won't be using that here for reasons that will become clear in the next post. Here's a simple example showing the relationship between age and likelihood of imagining a fictional story based on data from the first half of the concert.
 
 ```{r}
 model_fiction_age <- polr(Fictional_story ~ Age, data = data1, Hess = TRUE)
@@ -167,7 +167,7 @@ ggplot(predictions, aes(x = x, y = predicted, fill = response.level)) +
   theme_minimal()
 ```
 
-It's also good to run a brant test to tell us whether the proportional odds assumption holds in our current model. The assumption is that the relationship between predictor and output is the same across all levels of the ordinal outcomes.
+It's also good to run a brant test — this tells us whether the proportional odds assumption holds in our current model. The assumption is that the relationship between predictor and output is the same across all levels of the ordinal outcomes.
 
 ```{r}
 brant.test(model_fiction_age)
@@ -196,6 +196,6 @@ model_no_int <- clm(Fictional_story ~ Age, data = data1)
 anova(model_int, model_no_int) %>% kable()
 ```
 
-The p value is still significantly above 0.05, so adding gender as an interaction variable doesn't significantly improve the model.
+The p value is markedly above 0.05, so adding gender as an interaction variable doesn't significantly improve the model.
 
 The question is, how can we select models with optimum demographic inputs? This is what will be covered in the 'Model Selection' portion of this blog.

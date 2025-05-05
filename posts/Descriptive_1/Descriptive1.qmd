@@ -5,7 +5,7 @@ execute:
   warning: false
 ---
 
-In this section we'll look at the overall distribution of different thought types and movements in the datasets.
+In this section we'll look at the overall distribution of different thought types and movements in the data.
 
 ```{r}
 library(tidyverse)
@@ -17,7 +17,7 @@ library(knitr)
 library(skimr)
 ```
 
-Here are the dataframes that we tidied up in the dataset overview page.
+Here are the dataframes that we tidied up in the dataset overview post.
 
 ```{r}
 data <- read_csv("https://raw.githubusercontent.com/hw3446/Final_Project_PUC/main/posts/Dataset_overview/working_data/data.csv")
@@ -77,7 +77,7 @@ thoughts_long2 <- data2 %>%
   filter(!is.na(Response))
 ```
 
-These dataframes are used for the first plots, which show the counts for each type of thought during each half.
+These dataframes are used for the first plots, which show the counts for each type of thought during each half of the concert.
 
 ```{r}
 #First half
@@ -239,7 +239,7 @@ story_plot2
 
 DEMOGRAPHIC INFO
 
-We'll get a quick overview of our demographic data. Note, first we're going to add a 'Floor' column based on participants' location in the hall. Having this info is useful, as concert subscribers and many older patrons sit downstairs in the auditorium.
+We'll also get a quick overview of our demographic data. Note, first we're going to add a 'Floor' column based on participants' location in the hall. Having this info is useful, as concert subscribers and many older patrons sit downstairs in the auditorium.
 
 Here's a map of each location in the hall for reference:
 
@@ -259,3 +259,5 @@ demographics <- c('Age', 'Gender', 'Music_listening', 'Practice', 'Floor')
 demographics_data <- dplyr::select(data, all_of(demographics))
 skim(demographics_data)
 ```
+
+The above has given an insight into the distribution of different thought types, shown associations between thoughts and movements, and looked at the demographic variables. In the next section, we'll move to the next level of building some ordinal regression models that predict thought types using demographic variables.

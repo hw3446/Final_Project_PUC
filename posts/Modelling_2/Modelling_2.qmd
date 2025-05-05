@@ -6,6 +6,14 @@ execute:
   warning: false
 ---
 
+In this section, we'll experiment with the step() function in R to help select ordinal regression models for our data.
+
+step() is not compatible with clm(), which is why we'll use polr().
+
+The step() function starts with a full model containing all the possible main effects (in this case all the possible demographic variables). It tests different combinations of variables and then keeps the model with the lowest AIC.
+
+This is helpful when we're dealing with lots of different outcome variables and lots of demographic inputs and we need to figure out which ones to use.
+
 ```{r}
 library(tidyverse)
 library(MASS)
@@ -15,16 +23,6 @@ library(car)
 library(knitr)
 ```
 
-In this section, we'll experiment with the step() function in R to help select ordinal regression models for our data.
-
-step() is not compatible with clm(), which is why we'll use polr().
-
-The step() function starts with a full model containing all the possible main effects (in this case all the possible demographic variables). It tests different combinations of variables and then keeps the model with the lowest AIC.
-
-This is helpful when we're dealing with lots of different outcome variables and lots of demographic inputs and we need to figure out which ones to use.
-
-Here's how we'd run the step() function starting with all the demographic variables and using just fictional story as our outcome.
-
 First some data loading, and demographic variable tidying.
 
 ```{r}
@@ -32,6 +30,8 @@ data1 <- read_csv("https://raw.githubusercontent.com/hw3446/Final_Project_PUC/ma
 
 data2 <- read_csv("https://raw.githubusercontent.com/hw3446/Final_Project_PUC/main/posts/Dataset_overview/working_data/data2.csv")
 ```
+
+Let's tidy our outcome and demographic variables.
 
 ```{r}
 outcome_vars <- c("Fictional_story", "Abstract_shapes", "Sensory_sensations", 
@@ -69,9 +69,9 @@ data1$Floor <- factor(data1$Floor, levels = c('Downstairs', 'Upstairs'))
 data2$Floor <- factor(data2$Floor, levels = c('Downstairs', 'Upstairs'))
 ```
 
-We have some NAs in our dataframe, so before running the models, we need to figure out what to do with these.
+We also have some NAs in our dataframe, so before running the models, we need to figure out what to do with these.
 
-Let's get a map of our missing data:
+First a map of our missing data:
 
 ```{r}
 
@@ -102,22 +102,24 @@ imputed_data1 <- mice(data1, m = 5, method = 'pmm', seed = 123, print = FALSE)
 completed_data1 <- complete(imputed_data1, 1)
 ```
 
-Let's now run the step() function with our imputed data for fictional story.
-
-1.  Start by specifying the model with with maximum number of demographic inputs.
+Let's now run the step() function with our imputed data. We'll start the function using all of the demographic inputs, and have likelihood of imagining a fictional story as our outcome variable.
 
 ```{r}
+#Specifying a model with the maximum number of demographic inputs.
+
 model_fiction_imp <- polr(Fictional_story ~ Age + Gender + Music_listening + Practice + Floor, 
               data = completed_data1, Hess = TRUE, method = "logistic")
+
+#Running the step() function
 
 stepwise_model_imp <- step(model_fiction_imp)
 
 summary(stepwise_model_imp)
 ```
 
-Here step() ran through all the possible demographics to find the model with the lowest AIC. In this case the most successful model was one with just age as a demographic input.
+Here, step() ran through all the possible demographics to find the model with the lowest AIC (an estimator of prediction error). In this case the most successful model was one with just age as a demographic input.
 
-We can run the step() function looping through all the possible outcome variables using the imputed data.
+We can run the step() function and loop through all the possible outcome variables using the imputed data.
 
 ```{r}
 # List to store results
@@ -217,7 +219,7 @@ All vif() outputs are close to 1, indicating that multicollinearity shouldn't be
 
 In the post on 'Ordinal regression: final models', we'll use these step() results to run some final model visualisations.
 
-Rerunning the above steps for the second dataset:
+Let's also just rerun the above steps for the second dataset.
 
 ```{r}
 imputed_data2 <- mice(data2, m = 5, method = 'pmm', seed = 123, print = FALSE)
@@ -283,3 +285,5 @@ Models that don't match the first half:
 -   polr(formula = Music \~ Age + Gender + Practice, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "logistic")
 
 -   polr(formula = Building \~ Floor, data = completed_data2, control = list(maxit = 1000), na.action = na.exclude, Hess = TRUE, method = "logistic")
+
+We won't create visualisations for these models in the next post, but in the final summary we will look at comparing their predictions with the predictions from the first half.
